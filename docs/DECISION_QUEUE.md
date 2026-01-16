@@ -18,44 +18,6 @@
 
 <!-- Decisions awaiting ChatGPT input -->
 
-### [DECISION-002] Board Format Standard
-
-**Status:** PENDING_FOUNDER
-**Priority:** HIGH
-**Created:** 2025-01-15
-**Blocking:** Board implementation in Rust core
-
-**Context:**
-We need to choose a format for storing communication boards. This affects portability, community sharing, and integration with other AAC tools.
-
-**Options:**
-
-1. **Option A: Open Board Format (OBF)**
-   - Description: Industry-standard AAC interchange format (.obz/.obf files)
-   - Pros: Interoperability with TouchChat, Proloquo2Go, CoughDrop, and other AAC apps
-   - Cons: May not capture all LoveWords-specific features; format is XML-based
-
-2. **Option B: Custom JSON Format + OBF Export**
-   - Description: Our own JSON format internally, with OBF export/import capability
-   - Pros: Full flexibility for LoveWords features, still portable via export
-   - Cons: More work to maintain both formats
-
-3. **Option C: OBF as Primary with Extensions**
-   - Description: Use OBF natively but extend it with LoveWords-specific fields
-   - Pros: Best of both worlds—compatible and extensible
-   - Cons: Extensions may not transfer to other apps
-
-**Trade-offs:**
-Pure OBF limits innovation in board structure. Custom format risks fragmentation. Extensions balance both but add complexity.
-
-**Claude Code's Recommendation:**
-Option C - OBF as primary with documented extensions. This maximizes interoperability while allowing innovation. Extensions that prove useful could be proposed to the OBF standard.
-
-**Questions for ChatGPT:**
-1. How important is native OBF compatibility vs. feature flexibility?
-2. Should LoveWords aim to influence/extend the OBF standard?
-
----
 
 ### [DECISION-003] Voice Recording Storage
 
@@ -96,44 +58,6 @@ Option C for v1.0, with Option B as future enhancement. Keeps initial scope simp
 
 ---
 
-### [DECISION-004] Svelte vs React for Web Frontends
-
-**Status:** PENDING_FOUNDER
-**Priority:** MEDIUM
-**Created:** 2025-01-15
-**Blocking:** Tauri and Chrome extension development
-
-**Context:**
-Need to choose a frontend framework for Tauri desktop app and Chrome extension.
-
-**Options:**
-
-1. **Option A: Svelte**
-   - Description: Lightweight, compiler-based framework
-   - Pros: Smaller bundles, simpler mental model, less boilerplate, growing community
-   - Cons: Smaller ecosystem than React, fewer pre-built components
-
-2. **Option B: React**
-   - Description: Established component library framework
-   - Pros: Huge ecosystem, many AAC-specific components exist, more developers know it
-   - Cons: Larger bundles, more boilerplate, heavier runtime
-
-3. **Option C: Solid.js**
-   - Description: React-like API with Svelte-like compilation
-   - Pros: Best of both worlds technically, fine-grained reactivity
-   - Cons: Smallest ecosystem of the three, newer
-
-**Trade-offs:**
-Ecosystem size vs. simplicity. Contributor familiarity vs. new contributor learning curve.
-
-**Claude Code's Recommendation:**
-Option A (Svelte) - aligns with "simplicity over cleverness" heuristic, produces smaller offline-first bundles, and the simpler mental model helps new contributors.
-
-**Questions for ChatGPT:**
-1. Does ecosystem size or simplicity matter more for LoveWords?
-2. Is React familiarity among potential contributors a significant factor?
-
----
 
 ### [DECISION-005] Commercial Use Case Expansion
 
@@ -185,8 +109,8 @@ Focus vs. breadth. Sustainability vs. mission purity.
 Use Rust core with native clients for each platform:
 - iOS/iPadOS/watchOS: Swift + SwiftUI with UniFFI bindings
 - macOS: Swift + SwiftUI with UniFFI bindings
-- Chrome Extension: WebAssembly via wasm-pack + Svelte
-- Desktop: Tauri with Svelte frontend
+- Chrome Extension: WebAssembly via wasm-pack + React
+- Desktop: Tauri with React frontend
 
 **Rationale:**
 - Rust provides memory-safe, performant core logic that can run anywhere
@@ -242,6 +166,73 @@ Tauri desktop app (macOS first, then Windows/Linux) before mobile clients.
 
 ---
 
+### [DECISION-002] Board Format Standard
+
+**Status:** RESOLVED
+**Decision Date:** 2025-01-16
+**Decided By:** ChatGPT (founder) via Claude Code relay
+
+**Decision:**
+Adopt Open Board Format (OBF) natively. LoveWords-specific features implemented via namespaced extensions that preserve compatibility (e.g., `lovewords:*` metadata), not by replacing OBF.
+
+**Rationale:**
+- **Interoperability is the trust anchor.** Families and clinicians are wary of lock-in. "You can leave anytime with your boards" is a core promise.
+- **We're relationship-first, not format-first.** The emotional/relationship focus should show up in the boards we ship and the UX, not by inventing a new storage format.
+- **OBF reduces adoption friction.** Importing existing boards (or building from existing ecosystems) is a force multiplier for early users.
+- **Future community library depends on portability.** If people share boards, they should work elsewhere too.
+
+**How we handle relationship-focused features without breaking OBF:**
+- Use namespaced optional metadata (`lovewords:*`) to store features like:
+  - "moments" grouping (bedtime, apology, comfort)
+  - warmth/intent tags (affection, gratitude, reassurance)
+  - suggested phrases / quick-say variants
+- Never require LoveWords-only fields to render or speak a board
+- Keep export/import "round-trippable" within LoveWords while remaining valid OBF
+
+**Implementation Changes:**
+- Storage layer uses OBF structures as the source of truth
+- Starter boards are authored as OBF (with optional LoveWords metadata)
+- Export is straightforward (already OBF); import is first-class
+
+**OBF Compatibility Contract:**
+- We are OBF-native
+- LoveWords metadata is optional and namespaced
+- We will not introduce breaking schema forks
+
+---
+
+### [DECISION-004] UI Framework — Choose React
+
+**Status:** RESOLVED
+**Decision Date:** 2025-01-16
+**Decided By:** ChatGPT (founder) via Claude Code relay
+
+**Decision:**
+Use React for the LoveWords desktop app (Tauri) and Chrome extension.
+
+**Rationale:**
+- **Contributor gravity matters more than bundle size right now.** LoveWords lives or dies by community contribution (boards, UI accessibility, localization, caregivers/SLPs). React lowers the "can jump in today" barrier.
+- **Accessibility + extension + desktop patterns are well-trodden.** React has a large body of examples and battle-tested patterns for keyboard navigation, focus management, and complex component state—exactly where AAC UIs get tricky.
+- **Our simplicity is a product principle, not a framework choice.** "Simplicity over cleverness" should be enforced via design system constraints, linting/conventions, and an intentionally small component API—not by picking a framework with fewer footguns.
+- **Risk management.** Svelte is great, but React reduces the chance we get stuck on a niche integration or lose momentum because fewer volunteers feel confident touching core UI code.
+
+**Guardrails to preserve simplicity (non-negotiables):**
+- Limit dependencies; no "framework-of-the-week" layering
+- Keep state local and boring; avoid clever abstractions
+- Prefer plain components over meta-framework patterns unless needed
+- Accessibility acceptance criteria per feature: keyboard-first, predictable focus, clear semantics
+
+**Implementation Changes:**
+- Update ARCHITECTURE.md to reflect React as the committed choice
+- Remove "pending decision" language
+- Tauri desktop: React frontend
+- Chrome extension: React-based popup/content UI
+
+**Heuristics Captured:**
+- TH-005: Contributor Gravity Over Technical Elegance
+
+---
+
 ## Decision Log (Chronological)
 
 | ID | Title | Status | Date | Outcome |
@@ -249,9 +240,9 @@ Tauri desktop app (macOS first, then Windows/Linux) before mobile clients.
 | DECISION-000 | Multi-Platform Architecture | RESOLVED | 2025-01-15 | Rust core + native clients |
 | DECISION-001 | iOS Development Approach | RESOLVED | 2025-01-15 | Pure Swift + UniFFI |
 | DECISION-001.1 | First Client to Build | RESOLVED | 2025-01-15 | Tauri desktop first |
-| DECISION-002 | Board Format Standard | PENDING | 2025-01-15 | - |
+| DECISION-002 | Board Format Standard | RESOLVED | 2025-01-16 | OBF-native with namespaced extensions |
 | DECISION-003 | Voice Recording Storage | PENDING | 2025-01-15 | - |
-| DECISION-004 | Web Framework Choice | PENDING | 2025-01-15 | - |
+| DECISION-004 | UI Framework Choice | RESOLVED | 2025-01-16 | React (contributor gravity) |
 | DECISION-005 | Commercial Use Cases | PENDING | 2025-01-15 | - |
 
 ---

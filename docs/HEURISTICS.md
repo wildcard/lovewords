@@ -110,6 +110,49 @@ This document captures generalizable principles extracted from specific founder 
 
 ---
 
+### TH-005: Contributor Gravity Over Technical Elegance
+**Principle:** When choosing between technically equivalent options, prefer the one that maximizes contributor access.
+
+**Context:** Framework/library choices, tooling decisions, architecture.
+
+**Example:** React chosen over Svelte for web frontends because more volunteers can "jump in today" with React, even though Svelte has technical elegance advantages.
+
+**Guardrails:** Simplicity must still be enforced through design system constraints, linting, and intentionally small component APIs—not by picking a framework with fewer footguns.
+
+**Source:** [DECISION-004] UI Framework Choice
+
+**Date:** 2025-01-16
+
+---
+
+### TH-006: Interoperability as Trust Anchor
+**Principle:** Use industry-standard formats natively, not just as export targets. Portability builds user trust.
+
+**Context:** Data formats, storage decisions, import/export features.
+
+**Example:** LoveWords uses Open Board Format (OBF) natively, not a custom format with OBF export. Users can leave anytime with their boards.
+
+**Corollary:** LoveWords-specific features should be implemented via namespaced extensions that preserve compatibility, never by forking standards.
+
+**Source:** [DECISION-002] Board Format Standard
+
+**Date:** 2025-01-16
+
+---
+
+### TH-007: Relationship-First, Not Format-First
+**Principle:** LoveWords' emotional/relationship focus should show up in the boards we ship and the UX, not by inventing new storage formats or technical differentiators.
+
+**Context:** Feature design, board content, technical architecture.
+
+**Example:** "Love & Affection" board content is our differentiation—not a proprietary board format.
+
+**Source:** [DECISION-002] Board Format Standard
+
+**Date:** 2025-01-16
+
+---
+
 ## Product Heuristics
 
 ### PH-001: Warmth Over Clinical

@@ -87,7 +87,7 @@ LoveWords uses a **shared Rust core** with **native clients** for each platform.
 │     ┌──────────────┐   ┌──────────────┐   ┌──────────────────┐     │
 │     │ iOS/watchOS  │   │    Chrome    │   │      Tauri       │     │
 │     │    macOS     │   │   Extension  │   │ (Win/Mac/Linux)  │     │
-│     │  (SwiftUI)   │   │   (Svelte)   │   │    (Svelte)      │     │
+│     │  (SwiftUI)   │   │   (React)    │   │    (React)       │     │
 │     └──────────────┘   └──────────────┘   └──────────────────┘     │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
@@ -178,8 +178,8 @@ Each platform gets its own native client, providing the best possible experience
 | **iOS/iPadOS** | SwiftUI | UniFFI → Swift | AVSpeechSynthesis, VoiceOver, Switch Control |
 | **watchOS** | SwiftUI | UniFFI → Swift | Complications, quick phrases |
 | **macOS** | SwiftUI | UniFFI → Swift | Menu bar, keyboard shortcuts, macOS a11y |
-| **Chrome Extension** | Svelte | wasm-pack | Content scripts, popup UI, Chromebook support |
-| **Tauri Desktop** | Svelte | tauri-bindgen | Cross-platform, system TTS, file access |
+| **Chrome Extension** | React | wasm-pack | Content scripts, popup UI, Chromebook support |
+| **Tauri Desktop** | React | tauri-bindgen | Cross-platform, system TTS, file access |
 
 ### Build Sequence
 
@@ -289,15 +289,36 @@ Board
 | `Backspace` | Remove last item from message bar |
 | `Custom` | Platform-specific action (e.g., open settings) |
 
-### Board Format
+### Board Format — OBF Native
 
-Boards are stored as JSON. We support:
+LoveWords uses Open Board Format (OBF) natively, not as an export-only format:
 
 | Format | Use Case |
 |--------|----------|
-| **LoveWords JSON** | Internal storage, full feature support |
-| **Open Board Format (OBF)** | Import/export for interoperability |
-| **Backup archive** | Complete profile export (.zip) |
+| **Open Board Format (OBF)** | Native storage, full interoperability |
+| **LoveWords Extensions** | Optional namespaced metadata (`lovewords:*`) |
+| **Backup archive** | Complete profile export (.obz with assets) |
+
+#### OBF Compatibility Contract
+
+We commit to these guarantees:
+
+1. **We are OBF-native** — OBF is our source of truth, not a conversion target
+2. **LoveWords metadata is optional and namespaced** — Any extensions use `lovewords:*` prefix
+3. **We will not introduce breaking schema forks** — Boards remain portable to other AAC apps
+4. **Import/export is round-trippable** — Boards survive multiple import/export cycles
+
+#### LoveWords Extensions (Optional)
+
+These features are stored in namespaced OBF extensions:
+
+| Extension | Purpose |
+|-----------|---------|
+| `lovewords:moment` | Grouping for contexts (bedtime, apology, comfort) |
+| `lovewords:warmth` | Intent tags (affection, gratitude, reassurance) |
+| `lovewords:quickSay` | Suggested phrase variants |
+
+**Core principle:** A board never requires LoveWords extensions to render or speak. Extensions enhance, never gate.
 
 ---
 
@@ -476,10 +497,11 @@ All timing is configurable for motor needs:
 |-------|------------|-----------|
 | **Core Language** | Rust | Memory safety, performance, cross-platform |
 | **Core Serialization** | serde + JSON | Portable, debuggable |
+| **Board Format** | Open Board Format (OBF) | Industry standard, interoperability |
 | **iOS/macOS Bindings** | UniFFI | Automatic Swift/Kotlin generation |
 | **Web Bindings** | wasm-pack + wasm-bindgen | WebAssembly for Chrome |
 | **Desktop Framework** | Tauri | Rust backend, web frontend, small binary |
-| **Web UI Framework** | Svelte | Small bundles, simple mental model |
+| **Web UI Framework** | React | Contributor gravity, accessibility patterns |
 | **iOS/macOS UI** | SwiftUI | Modern, declarative, great a11y |
 | **Testing** | cargo test, XCTest, Playwright | Platform-appropriate |
 
@@ -549,7 +571,7 @@ lovewords/
 │   ├── src-tauri/
 │   │   ├── Cargo.toml
 │   │   └── src/
-│   ├── src/                   # Svelte frontend
+│   ├── src/                   # React frontend
 │   └── package.json
 │
 ├── apple/                     # iOS/macOS/watchOS

@@ -83,7 +83,7 @@ lovewords-core/
 
 ### Deliverables
 
-- [ ] Initialize Tauri project with Svelte frontend (pending [DECISION-004])
+- [ ] Initialize Tauri project with React frontend
 - [ ] Integrate lovewords-core via Tauri's Rust backend
 - [ ] Build board rendering component
 - [ ] Implement cell selection and message bar
@@ -104,12 +104,12 @@ lovewords-tauri/
 │   │   └── tts.rs          # Platform TTS
 │   └── tauri.conf.json
 ├── src/
-│   ├── App.svelte
+│   ├── App.tsx
 │   ├── components/
-│   │   ├── Board.svelte
-│   │   ├── Cell.svelte
-│   │   ├── MessageBar.svelte
-│   │   └── Settings.svelte
+│   │   ├── Board.tsx
+│   │   ├── Cell.tsx
+│   │   ├── MessageBar.tsx
+│   │   └── Settings.tsx
 │   └── lib/
 │       └── tauri-bridge.ts
 └── package.json
@@ -220,7 +220,7 @@ lovewords-apple/
 
 - [ ] WebAssembly build of lovewords-core
 - [ ] Chrome extension manifest v3
-- [ ] Svelte popup UI
+- [ ] React popup UI
 - [ ] Content script for on-page communication
 - [ ] Keyboard shortcuts
 - [ ] Chromebook accessibility testing
@@ -233,8 +233,8 @@ lovewords-chrome/
 ├── manifest.json
 ├── src/
 │   ├── popup/
-│   │   ├── App.svelte
-│   │   └── main.ts
+│   │   ├── App.tsx
+│   │   └── main.tsx
 │   ├── content/
 │   │   └── content.ts
 │   ├── background/
