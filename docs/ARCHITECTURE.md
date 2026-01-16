@@ -10,12 +10,12 @@ This document explains the technical architecture of LoveWords in a way that's a
 
 - [Project Goals](#project-goals)
 - [High-Level Overview](#high-level-overview)
-- [Core Components](#core-components)
+- [The Rust Core](#the-rust-core)
+- [Platform Clients](#platform-clients)
 - [Data Model](#data-model)
 - [Offline-First Approach](#offline-first-approach)
 - [Privacy Guarantees](#privacy-guarantees)
-- [Cross-Platform Strategy](#cross-platform-strategy)
-- [Future Extensibility](#future-extensibility)
+- [Accessibility Architecture](#accessibility-architecture)
 - [Technical Deep Dive](#technical-deep-dive)
 
 ---
@@ -32,14 +32,14 @@ Before diving into how LoveWords is built, let's understand what we're trying to
 | **Works Offline** | Internet should never be required |
 | **Truly Accessible** | Supports all input methods |
 | **Privacy First** | Your data stays yours |
-| **Cross-Platform** | Works on any device |
+| **Multi-Platform** | Native experience on every device |
 | **Fast & Reliable** | Communication can't wait |
 
 ### Technical Principles
 
-1. **Simplicity over cleverness** — Easy to understand and maintain
+1. **Shared logic, native feel** — Core logic in Rust, UI native to each platform
 2. **Offline by default** — Assume no network
-3. **Progressive enhancement** — Works everywhere, enhanced where possible
+3. **Simplicity over cleverness** — Easy to understand and maintain
 4. **Accessibility baked in** — Not an afterthought
 5. **User data ownership** — Export everything, import anywhere
 
@@ -47,189 +47,174 @@ Before diving into how LoveWords is built, let's understand what we're trying to
 
 ## High-Level Overview
 
-Here's how LoveWords fits together at the highest level:
+LoveWords uses a **shared Rust core** with **native clients** for each platform. This gives us the best of both worlds: consistent logic everywhere, with platform-native UI and accessibility.
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         USER INTERFACE                          │
-│  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────────┐ │
-│  │ Board View  │  │ Message Bar  │  │ Settings & Customization│ │
-│  └─────────────┘  └──────────────┘  └─────────────────────────┘ │
-├─────────────────────────────────────────────────────────────────┤
-│                      APPLICATION LAYER                          │
-│  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────────┐ │
-│  │ Board Logic │  │ Speech Engine│  │ Profile Management      │ │
-│  └─────────────┘  └──────────────┘  └─────────────────────────┘ │
-├─────────────────────────────────────────────────────────────────┤
-│                        DATA LAYER                               │
-│  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────────┐ │
-│  │Local Storage│  │ File System  │  │ Import/Export           │ │
-│  └─────────────┘  └──────────────┘  └─────────────────────────┘ │
-├─────────────────────────────────────────────────────────────────┤
-│                      PLATFORM LAYER                             │
-│  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────────┐ │
-│  │ Web Browser │  │   Mobile OS  │  │ Desktop OS              │ │
-│  └─────────────┘  └──────────────┘  └─────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                     LOVEWORDS ARCHITECTURE                           │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌────────────────────────────────────────────────────────────────┐ │
+│  │                    RUST CORE (lovewords-core)                   │ │
+│  │                                                                  │ │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │ │
+│  │  │ Board Model  │  │    Speech    │  │   Storage Layer      │  │ │
+│  │  │              │  │  Abstraction │  │                      │  │ │
+│  │  │ • Cells      │  │  • TTS Trait │  │ • Board CRUD         │  │ │
+│  │  │ • Navigation │  │  • Recording │  │ • Profile Mgmt       │  │ │
+│  │  │ • Phrases    │  │  • Playback  │  │ • Export/Import      │  │ │
+│  │  └──────────────┘  └──────────────┘  └──────────────────────┘  │ │
+│  │                                                                  │ │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │ │
+│  │  │ Input System │  │ Accessibility│  │  Symbol Registry     │  │ │
+│  │  │              │  │              │  │                      │  │ │
+│  │  │ • Unified    │  │ • Scanning   │  │ • Open symbol libs   │  │ │
+│  │  │ • Events     │  │ • Timing     │  │ • Photo symbols      │  │ │
+│  │  │ • Actions    │  │ • Dwell      │  │ • Custom images      │  │ │
+│  │  └──────────────┘  └──────────────┘  └──────────────────────┘  │ │
+│  │                                                                  │ │
+│  └────────────────────────────────────────────────────────────────┘ │
+│                                  │                                   │
+│               ┌──────────────────┼──────────────────┐               │
+│               ▼                  ▼                  ▼               │
+│     ┌──────────────┐   ┌──────────────┐   ┌──────────────────┐     │
+│     │   BINDINGS   │   │   BINDINGS   │   │     BINDINGS     │     │
+│     │    UniFFI    │   │   wasm-pack  │   │  tauri-bindgen   │     │
+│     │ (Swift/Kotlin)│   │   (Chrome)   │   │    (Desktop)     │     │
+│     └──────┬───────┘   └──────┬───────┘   └────────┬─────────┘     │
+│            │                  │                    │                │
+│            ▼                  ▼                    ▼                │
+│     ┌──────────────┐   ┌──────────────┐   ┌──────────────────┐     │
+│     │ iOS/watchOS  │   │    Chrome    │   │      Tauri       │     │
+│     │    macOS     │   │   Extension  │   │ (Win/Mac/Linux)  │     │
+│     │  (SwiftUI)   │   │   (Svelte)   │   │    (Svelte)      │     │
+│     └──────────────┘   └──────────────┘   └──────────────────┘     │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 **In plain language:**
-- The **User Interface** is what you see and interact with
-- The **Application Layer** handles the logic (what happens when you tap a symbol)
-- The **Data Layer** stores your boards, settings, and preferences locally
-- The **Platform Layer** lets LoveWords run on different devices
+- The **Rust Core** contains all the logic: how boards work, how navigation happens, how data is stored
+- **Bindings** translate Rust into languages each platform understands
+- **Native Clients** provide the actual user interface, using each platform's accessibility features
 
 ---
 
-## Core Components
+## The Rust Core
 
-### 1. Communication Boards
+The heart of LoveWords is `lovewords-core`, a Rust library that runs on every platform.
 
-Boards are the heart of LoveWords—the grids of symbols users tap to communicate.
+### Why Rust?
 
-```
-Board Structure:
-┌─────────────────────────────────────────────┐
-│  Board                                      │
-│  ├── Name: "Home Board"                     │
-│  ├── Grid: 4 columns × 5 rows               │
-│  ├── Style: colors, fonts, spacing          │
-│  │                                          │
-│  └── Cells: [                               │
-│        ├── Cell 1: {symbol, label, action}  │
-│        ├── Cell 2: {symbol, label, action}  │
-│        ├── Cell 3: {symbol, label, action}  │
-│        └── ... more cells                   │
-│      ]                                      │
-└─────────────────────────────────────────────┘
-```
+| Benefit | What It Means for Users |
+|---------|------------------------|
+| **Memory Safe** | No crashes from memory bugs |
+| **Fast** | Instant response to every tap |
+| **Portable** | Same logic on phone, tablet, computer |
+| **Reliable** | Fewer bugs, more consistent behavior |
 
-**What boards contain:**
-- **Cells** — Individual buttons with symbols
-- **Layout** — How cells are arranged (rows × columns)
-- **Navigation** — Links to other boards (folders/categories)
-- **Style** — Colors, sizes, spacing
-
-**What cells contain:**
-- **Symbol** — Image (from library or personal photo)
-- **Label** — Text shown below the symbol
-- **Message** — What gets spoken when selected
-- **Action** — What happens (speak, navigate, special function)
-- **Style** — Individual cell appearance
-
-### 2. User Profiles
-
-Profiles allow multiple people to use LoveWords on the same device, or one person to have different setups.
+### Core Modules
 
 ```
-Profile Structure:
-┌─────────────────────────────────────────────┐
-│  Profile                                    │
-│  ├── Name: "Jamie's Profile"                │
-│  ├── Avatar: photo or icon                  │
-│  │                                          │
-│  ├── Boards: [references to boards]         │
-│  │                                          │
-│  ├── Settings:                              │
-│  │   ├── Voice: selected TTS voice          │
-│  │   ├── Speech rate: 0.8                   │
-│  │   ├── Access method: touch               │
-│  │   ├── Theme: high-contrast-dark          │
-│  │   └── ... more settings                  │
-│  │                                          │
-│  └── History:                               │
-│      ├── Recent words                       │
-│      └── Usage statistics (local only)      │
-└─────────────────────────────────────────────┘
+lovewords-core/
+├── src/
+│   ├── lib.rs              # Public API
+│   │
+│   ├── board/              # Board Model
+│   │   ├── mod.rs          # Board struct, board operations
+│   │   ├── cell.rs         # Cell types, actions
+│   │   ├── layout.rs       # Grid layouts, positioning
+│   │   └── navigation.rs   # Cell selection, board switching
+│   │
+│   ├── speech/             # Speech Abstraction
+│   │   ├── mod.rs          # Speech coordinator
+│   │   ├── trait.rs        # Platform-agnostic TTS trait
+│   │   └── recording.rs    # Voice recording management
+│   │
+│   ├── storage/            # Persistence Layer
+│   │   ├── mod.rs          # Storage trait
+│   │   ├── profile.rs      # User profiles
+│   │   └── export.rs       # Import/Export (OBF support)
+│   │
+│   ├── input/              # Input System
+│   │   ├── mod.rs          # Input manager
+│   │   ├── event.rs        # Unified event types
+│   │   └── scanning.rs     # Switch scanning logic
+│   │
+│   ├── accessibility/      # Accessibility Utilities
+│   │   ├── mod.rs          # A11y coordinator
+│   │   └── timing.rs       # Scan timing, dwell settings
+│   │
+│   └── symbols/            # Symbol Management
+│       ├── mod.rs          # Symbol registry
+│       └── registry.rs     # Symbol lookup, caching
+│
+├── uniffi/                 # Swift/Kotlin bindings config
+├── wasm/                   # WebAssembly bindings
+└── tests/                  # Integration tests
 ```
 
-**Why profiles matter:**
-- **Different users** — Siblings can share a tablet
-- **Different contexts** — One setup for school, another for home
-- **Different access methods** — Touch at home, switch at therapy
-- **Easy switching** — Change profiles without losing anything
+### What the Core Does NOT Do
 
-### 3. Speech Engine
+The core is deliberately limited to **logic only**:
 
-The speech engine converts selected symbols into spoken words.
+- ❌ Does NOT render UI (that's the client's job)
+- ❌ Does NOT play audio (clients use platform TTS)
+- ❌ Does NOT access filesystem directly (clients provide storage)
+- ❌ Does NOT handle platform-specific accessibility APIs
 
-```
-Speech Flow:
-┌──────────┐    ┌───────────────┐    ┌──────────────┐    ┌─────────┐
-│ User taps│ →  │ Message added │ →  │ User presses │ →  │ Speech  │
-│ symbol   │    │ to bar        │    │ speak button │    │ output  │
-└──────────┘    └───────────────┘    └──────────────┘    └─────────┘
-```
+This separation ensures each platform can use its native capabilities while sharing all the logic.
 
-**Speech options:**
-- **Text-to-Speech (TTS)** — Computer-generated voice
-- **Recorded messages** — Personal voice recordings
-- **Hybrid** — TTS with personal recordings for names/phrases
+---
 
-**TTS Features:**
-- Multiple voice options (male, female, child-like)
-- Adjustable speech rate (slower ↔ faster)
-- Pitch adjustment
-- Offline voices (no internet needed)
+## Platform Clients
 
-### 4. Customization System
+Each platform gets its own native client, providing the best possible experience.
 
-Deep customization makes LoveWords truly personal.
+### Client Overview
+
+| Platform | UI Framework | Rust Binding | Key Features |
+|----------|--------------|--------------|--------------|
+| **iOS/iPadOS** | SwiftUI | UniFFI → Swift | AVSpeechSynthesis, VoiceOver, Switch Control |
+| **watchOS** | SwiftUI | UniFFI → Swift | Complications, quick phrases |
+| **macOS** | SwiftUI | UniFFI → Swift | Menu bar, keyboard shortcuts, macOS a11y |
+| **Chrome Extension** | Svelte | wasm-pack | Content scripts, popup UI, Chromebook support |
+| **Tauri Desktop** | Svelte | tauri-bindgen | Cross-platform, system TTS, file access |
+
+### Build Sequence
+
+We're building clients in this order:
 
 ```
-Customization Layers:
-┌─────────────────────────────────────────────┐
-│  Global Settings (affects everything)       │
-│  ├── Theme (colors, contrast)               │
-│  ├── Font size and style                    │
-│  ├── Default button size                    │
-│  └── Access method settings                 │
-├─────────────────────────────────────────────┤
-│  Board Settings (per board)                 │
-│  ├── Grid dimensions                        │
-│  ├── Board-specific colors                  │
-│  └── Category organization                  │
-├─────────────────────────────────────────────┤
-│  Cell Settings (individual buttons)         │
-│  ├── Symbol choice                          │
-│  ├── Custom message                         │
-│  ├── Size override                          │
-│  └── Style override                         │
-└─────────────────────────────────────────────┘
+Phase 1: Rust Core (lovewords-core)
+    ↓
+Phase 2: Tauri Desktop (macOS/Windows/Linux) ← First working UI
+    ↓
+Phase 3: iOS/iPadOS (Swift + UniFFI) ← Mobile reach
+    ↓
+Phase 4: watchOS companion
+    ↓
+Phase 5: macOS native (SwiftUI) ← Replaces Tauri on Mac
+    ↓
+Phase 6: Chrome Extension (wasm-pack) ← Chromebook support
 ```
 
-**Customization = Independence.** The more someone can personalize their communication tool, the more it becomes truly theirs.
+### Why Native Clients?
 
-### 5. Input System
+We considered cross-platform UI frameworks (React Native, Flutter) but chose native for these reasons:
 
-Supporting multiple ways to interact is crucial.
+| Reason | Explanation |
+|--------|-------------|
+| **Best Accessibility** | Platform-native a11y APIs work best |
+| **Expected Feel** | iOS users expect iOS feel, not a hybrid |
+| **Performance** | Native UI is faster, especially for AAC |
+| **Switch Control** | iOS Switch Control only works well with native |
 
-```
-Input Methods:
-┌─────────────────────────────────────────────────────────────┐
-│                      Input Manager                          │
-│                           │                                 │
-│    ┌──────────┬───────────┼───────────┬──────────┐         │
-│    ▼          ▼           ▼           ▼          ▼         │
-│ ┌──────┐ ┌────────┐ ┌──────────┐ ┌────────┐ ┌────────┐    │
-│ │Touch │ │Keyboard│ │  Switch  │ │Eye Gaze│ │ Mouse  │    │
-│ │      │ │        │ │ Scanner  │ │        │ │(Dwell) │    │
-│ └──────┘ └────────┘ └──────────┘ └────────┘ └────────┘    │
-│                           │                                 │
-│                           ▼                                 │
-│                  Unified Action System                      │
-│                  (same result regardless                    │
-│                   of input method)                          │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Key principle:** Every action should be possible through every input method. Tap, keyboard press, switch activation, and eye dwell all trigger the same underlying action.
+The Rust core means we don't duplicate logic—just UI.
 
 ---
 
 ## Data Model
-
-Here's how information is organized in LoveWords:
 
 ### Overview
 
@@ -238,91 +223,81 @@ LoveWords Data
 │
 ├── Profiles/
 │   ├── profile-1/
-│   │   ├── profile.json (settings, preferences)
+│   │   ├── profile.json      (settings, preferences)
 │   │   ├── boards/
-│   │   │   ├── home-board.json
-│   │   │   ├── food-board.json
-│   │   │   └── school-board.json
+│   │   │   ├── home.json
+│   │   │   ├── love.json
+│   │   │   └── comfort.json
 │   │   └── recordings/
-│   │       ├── greeting.mp3
-│   │       └── mom-name.mp3
+│   │       ├── mom-love.mp3
+│   │       └── greeting.mp3
 │   │
 │   └── profile-2/
 │       └── ...
 │
 ├── Shared/
-│   ├── symbols/ (symbol library)
-│   ├── voices/ (offline TTS data)
-│   └── templates/ (starter boards)
+│   ├── symbols/              (symbol library cache)
+│   ├── voices/               (offline TTS data)
+│   └── templates/            (starter boards)
 │
 └── Settings/
-    └── global-settings.json
+    └── global.json           (app-wide settings)
 ```
 
-### Board Data Format
+### Board Structure
 
-Boards are stored as JSON (a standard data format):
+Boards are the heart of LoveWords—grids of symbols users tap to communicate.
 
-```json
-{
-  "id": "home-board-123",
-  "name": "Home",
-  "version": 1,
-  "grid": {
-    "columns": 4,
-    "rows": 5
-  },
-  "cells": [
-    {
-      "id": "cell-1",
-      "position": { "row": 0, "column": 0 },
-      "symbol": {
-        "type": "library",
-        "id": "mulberry/i-want"
+```
+Board
+├── id: "home-board-abc123"
+├── name: "Home"
+├── grid: { columns: 4, rows: 5 }
+├── style: { spacing: 8, borderRadius: 8 }
+│
+└── cells: [
+      Cell {
+        id: "cell-1"
+        position: { row: 0, column: 0 }
+        symbol: { type: "library", id: "mulberry/i-want" }
+        label: "I want"
+        message: "I want"
+        action: Speak
+        style: { backgroundColor: "#ffeb3b" }
       },
-      "label": "I want",
-      "message": "I want",
-      "action": { "type": "speak" },
-      "style": {
-        "backgroundColor": "#ffeb3b"
-      }
-    },
-    {
-      "id": "cell-2",
-      "position": { "row": 0, "column": 1 },
-      "symbol": {
-        "type": "photo",
-        "path": "photos/mom.jpg"
+      Cell {
+        id: "cell-2"
+        position: { row: 0, column: 1 }
+        symbol: { type: "photo", path: "photos/mom.jpg" }
+        label: "Mom"
+        message: "I love you, mom"
+        action: Speak
+        style: { }
       },
-      "label": "Mom",
-      "message": "Mom",
-      "action": { "type": "speak" },
-      "style": {}
-    }
-  ],
-  "style": {
-    "cellSpacing": 8,
-    "borderRadius": 8
-  }
-}
+      // ... more cells
+    ]
 ```
 
-**Why JSON?**
-- Human-readable (you can open and understand it)
-- Universal (works across platforms)
-- Easy to import/export
-- Version-controllable
+### Cell Actions
 
-### Portability
+| Action Type | What It Does |
+|-------------|--------------|
+| `Speak` | Add message to bar, speak immediately or on confirm |
+| `Navigate` | Go to another board |
+| `Back` | Return to previous board |
+| `Clear` | Clear the message bar |
+| `Backspace` | Remove last item from message bar |
+| `Custom` | Platform-specific action (e.g., open settings) |
 
-Your data belongs to you. LoveWords supports:
+### Board Format
+
+Boards are stored as JSON. We support:
 
 | Format | Use Case |
 |--------|----------|
-| **Full export** | Complete backup of profile + boards |
-| **Board export** | Share individual boards |
-| **Open Board Format** | Industry-standard AAC interchange |
-| **Plain JSON** | For developers and power users |
+| **LoveWords JSON** | Internal storage, full feature support |
+| **Open Board Format (OBF)** | Import/export for interoperability |
+| **Backup archive** | Complete profile export (.zip) |
 
 ---
 
@@ -343,52 +318,41 @@ LoveWords is designed to work without internet. Always.
 ### How It Works
 
 ```
-Offline-First Architecture:
-
-┌─────────────────────────────────────────────────────────────┐
-│                        USER                                 │
-│                          │                                  │
-│                          ▼                                  │
-│                   ┌─────────────┐                           │
-│                   │ LoveWords   │                           │
-│                   │    App      │                           │
-│                   └──────┬──────┘                           │
-│                          │                                  │
-│    ┌─────────────────────┼─────────────────────┐           │
-│    ▼                     ▼                     ▼           │
-│ ┌──────────┐      ┌─────────────┐      ┌─────────────┐    │
-│ │  Local   │      │   Offline   │      │   Cached    │    │
-│ │  Storage │      │    TTS      │      │   Symbols   │    │
-│ │ (boards, │      │   Voices    │      │             │    │
-│ │ settings)│      │             │      │             │    │
-│ └──────────┘      └─────────────┘      └─────────────┘    │
-│                                                             │
-│    ════════════════════════════════════════════════════    │
-│                     NO INTERNET NEEDED                      │
-│    ════════════════════════════════════════════════════    │
-│                                                             │
-│    ┌─────────────────────────────────────────────────┐     │
-│    │             Optional Cloud Sync                  │     │
-│    │        (only if user explicitly opts in)        │     │
-│    └─────────────────────────────────────────────────┘     │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                        LoveWords App                                 │
+│                                                                      │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │                   WORKS COMPLETELY OFFLINE                   │    │
+│  │                                                               │    │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │    │
+│  │  │   Local     │  │   Offline   │  │   Cached Symbols    │  │    │
+│  │  │   Storage   │  │    TTS      │  │   (downloaded once) │  │    │
+│  │  │             │  │   Voices    │  │                     │  │    │
+│  │  └─────────────┘  └─────────────┘  └─────────────────────┘  │    │
+│  │                                                               │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+│                                                                      │
+│  ════════════════════════════════════════════════════════════════   │
+│                       OPTIONAL (OPT-IN ONLY)                         │
+│  ════════════════════════════════════════════════════════════════   │
+│                                                                      │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │                   Cloud Backup (E2E Encrypted)               │    │
+│  │                   Community Board Library                    │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Technical Implementation
 
 | Component | Offline Strategy |
 |-----------|------------------|
-| **Boards** | Stored locally (IndexedDB/filesystem) |
+| **Boards** | Stored locally (filesystem/SQLite) |
 | **Symbols** | Downloaded once, cached permanently |
-| **TTS Voices** | Offline voices bundled/downloaded |
+| **TTS Voices** | Use platform offline voices |
 | **Recordings** | Stored locally |
-| **App itself** | Service Worker for full offline access |
-
-**Service Workers** (web version) allow the app to:
-- Load without internet after first visit
-- Cache all assets locally
-- Work identically online and offline
+| **Rust Core** | All logic is local, no network calls |
 
 ---
 
@@ -417,7 +381,7 @@ Privacy isn't a feature—it's a fundamental right, especially for vulnerable us
 - ❌ Use analytics or tracking scripts
 - ❌ Require login or registration
 
-### Optional Cloud Features
+### Optional Cloud Features (Future)
 
 If we add cloud features (backup, sync), they will be:
 - **Strictly opt-in** (off by default)
@@ -426,120 +390,79 @@ If we add cloud features (backup, sync), they will be:
 - **Deletable** (remove your data anytime)
 - **Portable** (export and leave anytime)
 
-### Verification
-
-Don't trust—verify:
-- Source code is publicly available
-- No network requests in offline mode
-- Data stored in inspectable local storage
-- Third-party security audits welcome
-
 ---
 
-## Cross-Platform Strategy
+## Accessibility Architecture
 
-LoveWords runs everywhere because communication shouldn't depend on device.
+Accessibility is fundamental to LoveWords—it's an AAC tool, after all.
 
-### Platform Support
-
-```
-LoveWords Platform Support:
-
-                        ┌─────────────────┐
-                        │   Web (PWA)     │
-                        │  Any browser    │
-                        └────────┬────────┘
-                                 │
-         ┌───────────────────────┼───────────────────────┐
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│     Desktop     │    │     Mobile      │    │     Tablet      │
-│  Windows/Mac/   │    │   iOS/Android   │    │   iPad/Android  │
-│     Linux       │    │                 │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
-
-### Implementation Approach
-
-| Approach | Description | Benefit |
-|----------|-------------|---------|
-| **PWA Core** | Progressive Web App as foundation | Works in any browser immediately |
-| **Native wrappers** | Capacitor/Electron for app stores | Native features, app store presence |
-| **Shared codebase** | One codebase for all platforms | Consistent features everywhere |
-| **Responsive design** | Adapts to screen size | Same app, any device |
-
-### Progressive Web App (PWA)
-
-The web version is a "Progressive Web App" which means:
-- **Installable** — Add to home screen like an app
-- **Offline capable** — Works without internet
-- **Updateable** — Always the latest version
-- **No app store needed** — Access via URL
-
-### Why Web-First?
-
-| Reason | Explanation |
-|--------|-------------|
-| **Universal access** | No download needed, just a URL |
-| **No gatekeepers** | No app store approval delays |
-| **Instant updates** | Fixes available immediately |
-| **Lower barriers** | Anyone with a browser can use it |
-| **Shareability** | Send a link to share a board |
-
----
-
-## Future Extensibility
-
-LoveWords is designed to grow and adapt.
-
-### Planned Enhancements
-
-#### Communication Features
-- **Word prediction** — Suggest likely next words
-- **Sentence building** — Grammar support for building sentences
-- **Conversation history** — Review past conversations
-- **Quick replies** — Context-aware response suggestions
-
-#### Accessibility Features
-- **Eye gaze integration** — Direct support for popular eye trackers
-- **Head tracking** — Camera-based pointer control
-- **Voice control** — Navigate by voice
-- **Brain-computer interface** — Future BCI support
-
-#### Personalization
-- **Machine learning** — Learn from usage patterns (locally only)
-- **Dynamic boards** — Boards that adapt to context/time
-- **Theme creator** — Build and share visual themes
-- **Symbol editor** — Create custom symbols in-app
-
-#### Integration
-- **Open Board Format** — Full import/export compatibility
-- **External switches** — Bluetooth switch support
-- **Smart home** — Control home devices through AAC
-- **Education tools** — Curriculum integration
-
-### Plugin Architecture
-
-We're designing for extensibility:
+### Input Method Support
 
 ```
-Future Plugin System:
-┌─────────────────────────────────────────────────────────────┐
-│                     LoveWords Core                          │
-├─────────────────────────────────────────────────────────────┤
-│                      Plugin API                             │
-├──────────────┬──────────────┬──────────────┬───────────────┤
-│   Symbol     │    Voice     │   Access     │   Board       │
-│   Packs      │   Packs      │   Methods    │  Templates    │
-└──────────────┴──────────────┴──────────────┴───────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                        INPUT MANAGER (Rust Core)                     │
+│                                                                      │
+│                         Unified Event System                         │
+│                               │                                      │
+│    ┌────────────┬─────────────┼─────────────┬────────────┐          │
+│    ▼            ▼             ▼             ▼            ▼          │
+│ ┌──────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│ │Touch │  │ Keyboard │  │  Switch  │  │ Eye Gaze │  │  Mouse   │   │
+│ │      │  │          │  │ Scanning │  │          │  │ (Dwell)  │   │
+│ └──────┘  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
+│                               │                                      │
+│                               ▼                                      │
+│                    ┌─────────────────────┐                          │
+│                    │   Same Actions      │                          │
+│                    │   Regardless of     │                          │
+│                    │   Input Method      │                          │
+│                    └─────────────────────┘                          │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
-Plugins could add:
-- New symbol libraries
-- Additional TTS voices
-- Alternative access methods
-- Specialized board templates
-- Integration with external services
+**Key principle:** Every action is possible through every input method.
+
+### Platform-Specific Accessibility
+
+| Platform | Native A11y Features Used |
+|----------|--------------------------|
+| **iOS** | VoiceOver, Switch Control, AssistiveTouch, Dynamic Type |
+| **macOS** | VoiceOver, Switch Control, Keyboard Navigation, Reduce Motion |
+| **Chrome** | ChromeVox, Chromebook accessibility settings |
+| **Tauri** | Platform-native screen readers, keyboard navigation |
+
+### Switch Scanning
+
+The core implements switch scanning logic:
+
+```rust
+// Scanning modes (implemented in Rust core)
+enum ScanningMode {
+    Linear,      // One cell at a time
+    RowColumn,   // Highlight row, then cell in row
+    Group,       // Hierarchical groups
+}
+
+struct ScanningConfig {
+    mode: ScanningMode,
+    scan_rate_ms: u32,        // Time per item
+    auto_scan: bool,          // Auto-advance or manual
+    loops_before_exit: u8,    // How many times to loop
+    audio_cue: bool,          // Play sound on each item
+}
+```
+
+### Timing Adjustability
+
+All timing is configurable for motor needs:
+
+| Setting | Purpose | Range |
+|---------|---------|-------|
+| Scan rate | Time on each cell | 200ms - 5000ms |
+| Dwell time | Hold to select | 200ms - 3000ms |
+| Selection delay | After selection, pause | 0ms - 2000ms |
+| Auto-scan | Automatic or switch-triggered | On/Off |
 
 ---
 
@@ -551,122 +474,161 @@ Plugins could add:
 
 | Layer | Technology | Rationale |
 |-------|------------|-----------|
-| **UI Framework** | React | Component-based, accessible, large ecosystem |
-| **State Management** | Redux Toolkit | Predictable state, good DevTools |
-| **Styling** | CSS Modules + CSS Variables | Theming support, no runtime overhead |
-| **Storage** | IndexedDB (Dexie.js) | Large storage, good performance |
-| **TTS** | Web Speech API + fallbacks | Native browser support |
-| **Build** | Vite | Fast builds, modern defaults |
-| **Testing** | Vitest + Testing Library | Fast, accessibility-focused |
-| **PWA** | Workbox | Reliable offline, caching strategies |
+| **Core Language** | Rust | Memory safety, performance, cross-platform |
+| **Core Serialization** | serde + JSON | Portable, debuggable |
+| **iOS/macOS Bindings** | UniFFI | Automatic Swift/Kotlin generation |
+| **Web Bindings** | wasm-pack + wasm-bindgen | WebAssembly for Chrome |
+| **Desktop Framework** | Tauri | Rust backend, web frontend, small binary |
+| **Web UI Framework** | Svelte | Small bundles, simple mental model |
+| **iOS/macOS UI** | SwiftUI | Modern, declarative, great a11y |
+| **Testing** | cargo test, XCTest, Playwright | Platform-appropriate |
 
-### Code Architecture
+### Rust Core API
 
-```
-src/
-├── components/           # React components
-│   ├── Board/           # Board display components
-│   ├── Cell/            # Individual cell components
-│   ├── MessageBar/      # Message composition area
-│   ├── Navigation/      # Navigation components
-│   └── Settings/        # Settings UI
-│
-├── features/            # Feature-based modules
-│   ├── boards/          # Board state and logic
-│   ├── profiles/        # Profile management
-│   ├── speech/          # TTS and recordings
-│   ├── input/           # Input method handling
-│   └── accessibility/   # A11y utilities
-│
-├── services/            # Core services
-│   ├── storage/         # IndexedDB operations
-│   ├── speech/          # Speech synthesis
-│   └── import-export/   # Data portability
-│
-├── hooks/               # Custom React hooks
-├── utils/               # Utility functions
-├── types/               # TypeScript definitions
-└── styles/              # Global styles and themes
-```
+```rust
+// Core types
+pub struct Board {
+    pub id: BoardId,
+    pub name: String,
+    pub grid: GridSpec,
+    pub cells: Vec<Cell>,
+    pub style: BoardStyle,
+}
 
-### Key Design Decisions
+pub struct Cell {
+    pub id: CellId,
+    pub position: Position,
+    pub symbol: Symbol,
+    pub label: String,
+    pub message: String,
+    pub action: CellAction,
+    pub style: CellStyle,
+}
 
-#### 1. Offline-First Storage
+// Speech trait - implemented by each platform
+pub trait SpeechEngine {
+    fn speak(&self, text: &str, voice: &VoiceConfig) -> Result<(), SpeechError>;
+    fn stop(&self);
+    fn list_voices(&self) -> Vec<Voice>;
+}
 
-```typescript
-// Using Dexie.js for IndexedDB
-const db = new Dexie('LoveWords');
-db.version(1).stores({
-  profiles: '++id, name',
-  boards: '++id, profileId, name',
-  cells: '++id, boardId',
-  recordings: '++id, profileId'
-});
-```
+// Storage trait - implemented by each platform
+pub trait StorageBackend {
+    fn load_board(&self, id: &BoardId) -> Result<Board, StorageError>;
+    fn save_board(&self, board: &Board) -> Result<(), StorageError>;
+    fn load_profile(&self, id: &ProfileId) -> Result<Profile, StorageError>;
+    // ...
+}
 
-#### 2. Accessible by Default
-
-```typescript
-// All interactive components include accessibility
-interface ButtonProps {
-  label: string;           // Always required
-  ariaLabel?: string;      // Optional override
-  ariaPressed?: boolean;   // For toggle buttons
-  // ... other props
+// Input events - unified across all input methods
+pub enum InputEvent {
+    Select { cell_id: CellId },
+    Back,
+    Speak,
+    Clear,
+    Navigate { board_id: BoardId },
+    ScanNext,
+    ScanSelect,
 }
 ```
 
-#### 3. Input Method Abstraction
+### Directory Structure
 
-```typescript
-// Unified action system
-interface ActionEvent {
-  type: 'select' | 'back' | 'speak' | 'clear';
-  target?: string;
-  source: 'touch' | 'keyboard' | 'switch' | 'eyegaze';
-}
-
-// All input methods emit the same events
-inputManager.on('action', (event: ActionEvent) => {
-  // Handle identically regardless of source
-});
+```
+lovewords/
+├── Cargo.toml                 # Workspace root
+├── README.md
+├── CONTRIBUTING.md
+│
+├── core/                      # lovewords-core crate
+│   ├── Cargo.toml
+│   ├── src/
+│   └── tests/
+│
+├── tauri/                     # Tauri desktop app
+│   ├── src-tauri/
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   ├── src/                   # Svelte frontend
+│   └── package.json
+│
+├── apple/                     # iOS/macOS/watchOS
+│   ├── LoveWords.xcodeproj
+│   ├── Shared/
+│   ├── iOS/
+│   ├── macOS/
+│   └── watchOS/
+│
+├── chrome/                    # Chrome extension
+│   ├── manifest.json
+│   ├── src/
+│   └── package.json
+│
+├── boards/                    # Starter board JSON files
+│   ├── love-and-affection.json
+│   ├── gratitude.json
+│   └── ...
+│
+└── docs/                      # Documentation
+    ├── ARCHITECTURE.md        # This file
+    ├── VISION.md
+    ├── ROADMAP.md
+    ├── ACCESSIBILITY.md
+    └── ...
 ```
 
 ### Performance Targets
 
 | Metric | Target | Why |
 |--------|--------|-----|
-| First paint | < 1s | Communication can't wait |
-| Time to interactive | < 2s | Must be usable quickly |
-| Symbol render | < 16ms | Smooth scrolling/scanning |
+| First paint | < 500ms | Communication can't wait |
+| Time to interactive | < 1s | Must be usable quickly |
+| Cell tap → message | < 16ms | Smooth, responsive |
 | TTS latency | < 100ms | Natural conversation flow |
-| Memory usage | < 100MB | Works on older devices |
+| Memory usage | < 50MB | Works on older devices |
+| App size | < 20MB | Quick download, less storage |
 
-### Accessibility Testing
+### CI/CD Pipeline
 
-```bash
-# Automated accessibility checks
-npm run test:a11y
-
-# Manual testing checklist
-npm run test:manual
-
-# Screen reader testing
-# (Manual with NVDA, VoiceOver, TalkBack)
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                           GitHub Actions                             │
+│                                                                      │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │
+│  │ Rust Core   │  │   Tauri     │  │    iOS      │  │  Chrome   │  │
+│  │   Tests     │  │   Build     │  │   Build     │  │   Build   │  │
+│  │             │  │             │  │             │  │           │  │
+│  │ cargo test  │  │ tauri build │  │ xcodebuild  │  │ npm build │  │
+│  │ cargo clippy│  │             │  │             │  │           │  │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └───────────┘  │
+│         │                │                │               │         │
+│         └────────────────┴────────────────┴───────────────┘         │
+│                                  │                                   │
+│                                  ▼                                   │
+│                         Release Artifacts                            │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
+We welcome contributions. See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 
 ### For Technical Contributors
 
 1. Fork the repository
-2. Set up development environment (see CONTRIBUTING.md)
-3. Find an issue labeled `good first issue` or `help wanted`
+2. Set up development environment
+3. Find an issue labeled `good-first-issue` or `help-wanted`
 4. Submit a pull request
+
+### Areas Needing Help
+
+- **Rust Core** — Board logic, storage, accessibility
+- **iOS/SwiftUI** — Native iOS app development
+- **Accessibility Testing** — Real-world testing with AAC users
+- **Symbol Design** — Open-licensed communication symbols
 
 ### For Non-Technical Contributors
 
