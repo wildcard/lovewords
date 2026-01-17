@@ -1,0 +1,168 @@
+{
+  "format": "open-board-0.1",
+  "id": "people",
+  "name": "People",
+  "locale": "en-US",
+  "description_html": "<p>Pronouns and people in your life.</p>",
+  "buttons": [
+    {
+      "id": "btn_i",
+      "label": "I",
+      "vocalization": "I",
+      "action": ":add",
+      "background_color": "#87CEEB"
+    },
+    {
+      "id": "btn_you",
+      "label": "you",
+      "vocalization": "you",
+      "action": ":add",
+      "background_color": "#87CEEB"
+    },
+    {
+      "id": "btn_we",
+      "label": "we",
+      "vocalization": "we",
+      "action": ":add",
+      "background_color": "#87CEEB"
+    },
+    {
+      "id": "btn_they",
+      "label": "they",
+      "vocalization": "they",
+      "action": ":add",
+      "background_color": "#87CEEB"
+    },
+    {
+      "id": "btn_he",
+      "label": "he",
+      "vocalization": "he",
+      "action": ":add",
+      "background_color": "#B0E0E6"
+    },
+    {
+      "id": "btn_she",
+      "label": "she",
+      "vocalization": "she",
+      "action": ":add",
+      "background_color": "#B0E0E6"
+    },
+    {
+      "id": "btn_me",
+      "label": "me",
+      "vocalization": "me",
+      "action": ":add",
+      "background_color": "#ADD8E6"
+    },
+    {
+      "id": "btn_us",
+      "label": "us",
+      "vocalization": "us",
+      "action": ":add",
+      "background_color": "#ADD8E6"
+    },
+    {
+      "id": "btn_mom",
+      "label": "mom",
+      "vocalization": "mom",
+      "action": ":add",
+      "background_color": "#FFB6C1"
+    },
+    {
+      "id": "btn_dad",
+      "label": "dad",
+      "vocalization": "dad",
+      "action": ":add",
+      "background_color": "#87CEFA"
+    },
+    {
+      "id": "btn_friend",
+      "label": "friend",
+      "vocalization": "friend",
+      "action": ":add",
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_family",
+      "label": "family",
+      "vocalization": "family",
+      "action": ":add",
+      "background_color": "#DDA0DD"
+    },
+    {
+      "id": "btn_partner",
+      "label": "partner",
+      "vocalization": "partner",
+      "action": ":add",
+      "background_color": "#FF69B4"
+    },
+    {
+      "id": "btn_baby",
+      "label": "baby",
+      "vocalization": "baby",
+      "action": ":add",
+      "background_color": "#FFDAB9"
+    },
+    {
+      "id": "btn_person",
+      "label": "person",
+      "vocalization": "person",
+      "action": ":add",
+      "background_color": "#E0E0E0"
+    },
+    {
+      "id": "btn_people",
+      "label": "people",
+      "vocalization": "people",
+      "action": ":add",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_back",
+      "label": "Back",
+      "action": ":back",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_home",
+      "label": "Home",
+      "action": ":home",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_basic_needs_nav",
+      "label": "Basic Needs",
+      "load_board": {
+        "id": "basic-needs"
+      },
+      "background_color": "#90EE90"
+    },
+    {
+      "id": "btn_love_affection_nav",
+      "label": "Love & Affection",
+      "load_board": {
+        "id": "love-and-affection"
+      },
+      "background_color": "#FFB6C1"
+    }
+  ],
+  "images": [],
+  "sounds": [],
+  "grid": {
+    "rows": 5,
+    "columns": 4,
+    "order": [
+      ["btn_i", "btn_you", "btn_we", "btn_they"],
+      ["btn_he", "btn_she", "btn_me", "btn_us"],
+      ["btn_mom", "btn_dad", "btn_friend", "btn_family"],
+      ["btn_partner", "btn_baby", "btn_person", "btn_people"],
+      ["btn_back", "btn_home", "btn_basic_needs_nav", "btn_love_affection_nav"]
+    ]
+  },
+  "license": {
+    "type": "CC BY-SA 4.0",
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "author_name": "LoveWords Project",
+    "author_url": "https://github.com/wildcard/lovewords"
+  }
+}
