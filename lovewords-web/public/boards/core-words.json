@@ -1,0 +1,124 @@
+{
+  "format": "open-board-0.1",
+  "id": "core-words",
+  "name": "Core Words",
+  "locale": "en",
+  "description_html": "<p>Build messages by combining words</p>",
+  "buttons": [
+    {
+      "id": "btn_i",
+      "label": "I",
+      "action": ":add",
+      "background_color": "#FFE4B5"
+    },
+    {
+      "id": "btn_you",
+      "label": "you",
+      "action": ":add",
+      "background_color": "#FFE4B5"
+    },
+    {
+      "id": "btn_want",
+      "label": "want",
+      "action": ":add",
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_need",
+      "label": "need",
+      "action": ":add",
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_like",
+      "label": "like",
+      "action": ":add",
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_go",
+      "label": "go",
+      "action": ":add",
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_help",
+      "label": "help",
+      "action": ":add",
+      "background_color": "#87CEEB"
+    },
+    {
+      "id": "btn_eat",
+      "label": "eat",
+      "action": ":add",
+      "background_color": "#FFB6C1"
+    },
+    {
+      "id": "btn_drink",
+      "label": "drink",
+      "action": ":add",
+      "background_color": "#FFB6C1"
+    },
+    {
+      "id": "btn_sleep",
+      "label": "sleep",
+      "action": ":add",
+      "background_color": "#DDA0DD"
+    },
+    {
+      "id": "btn_happy",
+      "label": "happy",
+      "action": ":add",
+      "background_color": "#FFD700"
+    },
+    {
+      "id": "btn_love",
+      "label": "love",
+      "action": ":add",
+      "background_color": "#FF69B4"
+    },
+    {
+      "id": "btn_home",
+      "label": "Home",
+      "action": ":home",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_back",
+      "label": "Back",
+      "action": ":back",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_backspace",
+      "label": "⌫",
+      "vocalization": "Backspace",
+      "action": ":backspace",
+      "background_color": "#FFA07A"
+    },
+    {
+      "id": "btn_clear",
+      "label": "Clear",
+      "action": ":clear",
+      "background_color": "#F08080"
+    }
+  ],
+  "images": [],
+  "sounds": [],
+  "grid": {
+    "rows": 4,
+    "columns": 4,
+    "order": [
+      ["btn_i", "btn_you", "btn_want", "btn_need"],
+      ["btn_like", "btn_go", "btn_help", "btn_eat"],
+      ["btn_drink", "btn_sleep", "btn_happy", "btn_love"],
+      ["btn_home", "btn_back", "btn_backspace", "btn_clear"]
+    ]
+  },
+  "license": {
+    "type": "CC BY-SA 4.0",
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "author_name": "LoveWords Project",
+    "author_url": "https://github.com/wildcard/lovewords"
+  }
+}

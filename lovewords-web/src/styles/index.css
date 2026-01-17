@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply min-h-screen bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .cell-button {
+    @apply flex flex-col items-center justify-center p-4 rounded-lg shadow-md transition-all;
+    @apply hover:shadow-lg active:scale-95;
+    @apply focus:outline-none focus:ring-4 focus:ring-blue-500;
+    @apply font-semibold text-lg;
+  }
+
+  .message-bar {
+    @apply bg-white border-2 border-gray-300 rounded-lg p-4 shadow-md;
+    @apply text-xl font-medium;
+  }
+
+  .nav-button {
+    @apply px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500;
+    @apply transition-colors;
+  }
+}
