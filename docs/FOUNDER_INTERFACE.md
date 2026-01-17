@@ -237,11 +237,11 @@ User copies the formatted decision question to ChatGPT conversation.
 
 ### Step 3: ChatGPT Responds
 
-> "Let's go with Svelte. It aligns with our 'simplicity over cleverness' principle,
-> produces smaller bundles which helps with our offline-first approach, and the
-> learning curve is gentler for contributors. React's ecosystem is larger, but
-> we value approachability over ecosystem size. This is consistent with our
-> commitment to being a welcoming project."
+> "Let's go with React. While Svelte is technically elegant, contributor gravity
+> matters more than bundle size right now. React's accessibility patterns for AAC
+> are well-established, and more volunteers can jump in today. We'll enforce
+> simplicity through design system constraints and linting, not framework choice.
+> This supports our 'community over company' principle."
 
 ### Step 4: User Relays Response
 
@@ -252,9 +252,9 @@ User pastes ChatGPT's response to Claude Code.
 Claude Code:
 1. Updates `DECISION_QUEUE.md` with resolved decision
 2. Adds heuristic to `HEURISTICS.md`:
-   - "Choose simpler tools over ecosystem size"
-   - "Approachability for contributors is a priority"
-3. Proceeds with Svelte implementation
+   - "Contributor gravity over technical elegance"
+   - "Enforce simplicity through constraints, not tool choice"
+3. Proceeds with React implementation
 4. Updates related GitHub issues
 
 ---

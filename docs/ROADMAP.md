@@ -266,7 +266,7 @@ lovewords-chrome/
 - [ ] "My People" photo personalization
 - [ ] Voice recording feature
 - [ ] Profile management (multiple users per device)
-- [ ] Board import/export (OBF compatible, pending [DECISION-002])
+- [ ] Board import/export (OBF v1.0 native per [DECISION-002])
 - [ ] Onboarding flow
 - [ ] Help documentation
 - [ ] Marketing site

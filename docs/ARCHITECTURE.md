@@ -308,6 +308,12 @@ We commit to these guarantees:
 3. **We will not introduce breaking schema forks** — Boards remain portable to other AAC apps
 4. **Import/export is round-trippable** — Boards survive multiple import/export cycles
 
+#### OBF Specification Reference
+
+LoveWords implements **Open Board Format v1.0**:
+- Specification: https://www.openboardformat.org/
+- Schema: https://github.com/openboardformat/oaa
+
 #### LoveWords Extensions (Optional)
 
 These features are stored in namespaced OBF extensions:
