@@ -50,7 +50,7 @@ export class LocalStorageBackend implements StorageBackend {
   async listBoards(): Promise<string[]> {
     // For now, hardcode the list of available boards
     // In a real app, you might fetch this from an API or manifest
-    return ['love-and-affection', 'core-words', 'feelings', 'activities', 'questions', 'time'];
+    return ['love-and-affection', 'core-words', 'basic-needs', 'feelings', 'activities', 'questions', 'time'];
   }
 }
 

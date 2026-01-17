@@ -1,0 +1,168 @@
+{
+  "format": "open-board-0.1",
+  "id": "basic-needs",
+  "name": "Basic Needs",
+  "locale": "en-US",
+  "description_html": "<p>Essential words for expressing basic needs and building sentences.</p>",
+  "buttons": [
+    {
+      "id": "btn_i",
+      "label": "I",
+      "vocalization": "I",
+      "action": ":add",
+      "background_color": "#87CEEB"
+    },
+    {
+      "id": "btn_you",
+      "label": "you",
+      "vocalization": "you",
+      "action": ":add",
+      "background_color": "#87CEEB"
+    },
+    {
+      "id": "btn_want",
+      "label": "want",
+      "vocalization": "want",
+      "action": ":add",
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_need",
+      "label": "need",
+      "vocalization": "need",
+      "action": ":add",
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_help",
+      "label": "help",
+      "vocalization": "help",
+      "action": ":add",
+      "background_color": "#FF6B6B"
+    },
+    {
+      "id": "btn_yes",
+      "label": "yes",
+      "vocalization": "yes",
+      "action": ":add",
+      "background_color": "#90EE90"
+    },
+    {
+      "id": "btn_no",
+      "label": "no",
+      "vocalization": "no",
+      "action": ":add",
+      "background_color": "#FFB6C1"
+    },
+    {
+      "id": "btn_please",
+      "label": "please",
+      "vocalization": "please",
+      "action": ":add",
+      "background_color": "#FFD700"
+    },
+    {
+      "id": "btn_more",
+      "label": "more",
+      "vocalization": "more",
+      "action": ":add",
+      "background_color": "#DDA0DD"
+    },
+    {
+      "id": "btn_stop",
+      "label": "stop",
+      "vocalization": "stop",
+      "action": ":add",
+      "background_color": "#FF6347"
+    },
+    {
+      "id": "btn_go",
+      "label": "go",
+      "vocalization": "go",
+      "action": ":add",
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_come",
+      "label": "come",
+      "vocalization": "come",
+      "action": ":add",
+      "background_color": "#87CEEB"
+    },
+    {
+      "id": "btn_like",
+      "label": "like",
+      "vocalization": "like",
+      "action": ":add",
+      "background_color": "#FFB6C1"
+    },
+    {
+      "id": "btn_love",
+      "label": "love",
+      "vocalization": "love",
+      "action": ":add",
+      "background_color": "#FF69B4"
+    },
+    {
+      "id": "btn_can",
+      "label": "can",
+      "vocalization": "can",
+      "action": ":add",
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_to",
+      "label": "to",
+      "vocalization": "to",
+      "action": ":add",
+      "background_color": "#E6E6FA"
+    },
+    {
+      "id": "btn_back",
+      "label": "Back",
+      "action": ":back",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_home",
+      "label": "Home",
+      "action": ":home",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_love_affection_nav",
+      "label": "Love & Affection",
+      "load_board": {
+        "id": "love-and-affection"
+      },
+      "background_color": "#FFB6C1"
+    },
+    {
+      "id": "btn_core_words_nav",
+      "label": "Core Words",
+      "load_board": {
+        "id": "core-words"
+      },
+      "background_color": "#B0E0E6"
+    }
+  ],
+  "images": [],
+  "sounds": [],
+  "grid": {
+    "rows": 5,
+    "columns": 4,
+    "order": [
+      ["btn_i", "btn_you", "btn_want", "btn_need"],
+      ["btn_help", "btn_yes", "btn_no", "btn_please"],
+      ["btn_more", "btn_stop", "btn_go", "btn_come"],
+      ["btn_like", "btn_love", "btn_can", "btn_to"],
+      ["btn_back", "btn_home", "btn_love_affection_nav", "btn_core_words_nav"]
+    ]
+  },
+  "license": {
+    "type": "CC BY-SA 4.0",
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "author_name": "LoveWords Project",
+    "author_url": "https://github.com/wildcard/lovewords"
+  }
+}
