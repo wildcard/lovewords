@@ -1,0 +1,149 @@
+{
+  "format": "open-board-0.1",
+  "id": "love-and-affection",
+  "name": "Love & Affection",
+  "locale": "en",
+  "description_html": "<p>Express love and affection to your partner, family, and friends.</p>",
+  "buttons": [
+    {
+      "id": "btn_love_you",
+      "label": "I love you",
+      "vocalization": "I love you",
+      "action": ":speak",
+      "background_color": "#FFB6C1",
+      "ext_lovewords_warmth": ["affection", "romantic"],
+      "ext_lovewords_intimacy_level": 4,
+      "ext_lovewords_partner_specific": true,
+      "ext_lovewords_tone": "warm"
+    },
+    {
+      "id": "btn_love_so_much",
+      "label": "I love you so much",
+      "vocalization": "I love you so much",
+      "action": ":speak",
+      "background_color": "#FF69B4",
+      "ext_lovewords_warmth": ["affection", "romantic"],
+      "ext_lovewords_intimacy_level": 4,
+      "ext_lovewords_partner_specific": true,
+      "ext_lovewords_tone": "warm"
+    },
+    {
+      "id": "btn_favorite",
+      "label": "You're my favorite",
+      "vocalization": "You're my favorite person",
+      "action": ":speak",
+      "background_color": "#DDA0DD",
+      "ext_lovewords_warmth": ["affection", "playful"],
+      "ext_lovewords_intimacy_level": 3,
+      "ext_lovewords_tone": "playful"
+    },
+    {
+      "id": "btn_miss_you",
+      "label": "I miss you",
+      "vocalization": "I miss you",
+      "action": ":speak",
+      "background_color": "#B0C4DE",
+      "ext_lovewords_warmth": ["affection", "comfort"],
+      "ext_lovewords_intimacy_level": 3,
+      "ext_lovewords_tone": "soft"
+    },
+    {
+      "id": "btn_thinking",
+      "label": "Thinking of you",
+      "vocalization": "I'm thinking of you",
+      "action": ":speak",
+      "background_color": "#E6E6FA",
+      "ext_lovewords_warmth": ["affection", "caring"],
+      "ext_lovewords_intimacy_level": 3,
+      "ext_lovewords_tone": "soft"
+    },
+    {
+      "id": "btn_hug",
+      "label": "I want a hug",
+      "vocalization": "I want a hug",
+      "action": ":speak",
+      "background_color": "#FFE4E1",
+      "ext_lovewords_warmth": ["affection", "comfort"],
+      "ext_lovewords_intimacy_level": 3,
+      "ext_lovewords_tone": "soft"
+    },
+    {
+      "id": "btn_kiss",
+      "label": "Kiss me",
+      "vocalization": "Kiss me",
+      "action": ":speak",
+      "background_color": "#FF6B6B",
+      "ext_lovewords_warmth": ["romantic"],
+      "ext_lovewords_intimacy_level": 4,
+      "ext_lovewords_partner_specific": true,
+      "ext_lovewords_tone": "playful"
+    },
+    {
+      "id": "btn_cuddle",
+      "label": "Let's cuddle",
+      "vocalization": "Let's cuddle",
+      "action": ":speak",
+      "background_color": "#FFDAB9",
+      "ext_lovewords_warmth": ["affection", "comfort"],
+      "ext_lovewords_intimacy_level": 4,
+      "ext_lovewords_partner_specific": true,
+      "ext_lovewords_tone": "soft"
+    },
+    {
+      "id": "btn_beautiful",
+      "label": "You're beautiful",
+      "vocalization": "You are so beautiful",
+      "action": ":speak",
+      "background_color": "#FFD700",
+      "ext_lovewords_warmth": ["affection", "romantic"],
+      "ext_lovewords_intimacy_level": 4,
+      "ext_lovewords_partner_specific": true,
+      "ext_lovewords_tone": "sincere"
+    },
+    {
+      "id": "btn_lucky",
+      "label": "I'm lucky",
+      "vocalization": "I'm so lucky to have you",
+      "action": ":speak",
+      "background_color": "#98FB98",
+      "ext_lovewords_warmth": ["gratitude", "affection"],
+      "ext_lovewords_intimacy_level": 3,
+      "ext_lovewords_tone": "sincere"
+    },
+    {
+      "id": "btn_best_thing",
+      "label": "Best thing",
+      "vocalization": "You're the best thing that ever happened to me",
+      "action": ":speak",
+      "background_color": "#87CEEB",
+      "ext_lovewords_warmth": ["affection", "gratitude"],
+      "ext_lovewords_intimacy_level": 4,
+      "ext_lovewords_partner_specific": true,
+      "ext_lovewords_tone": "sincere"
+    },
+    {
+      "id": "btn_back",
+      "label": "Back",
+      "action": ":back",
+      "background_color": "#D3D3D3"
+    }
+  ],
+  "images": [],
+  "sounds": [],
+  "grid": {
+    "rows": 3,
+    "columns": 4,
+    "order": [
+      ["btn_love_you", "btn_love_so_much", "btn_favorite", "btn_miss_you"],
+      ["btn_thinking", "btn_hug", "btn_kiss", "btn_cuddle"],
+      ["btn_beautiful", "btn_lucky", "btn_best_thing", "btn_back"]
+    ]
+  },
+  "license": {
+    "type": "CC BY-SA 4.0",
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "author_name": "LoveWords Project",
+    "author_url": "https://github.com/wildcard/lovewords"
+  },
+  "ext_lovewords_moment": "daily"
+}
