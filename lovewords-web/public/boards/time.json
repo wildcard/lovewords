@@ -1,0 +1,132 @@
+{
+  "format": "open-board-0.1",
+  "id": "time",
+  "name": "Time & Schedule",
+  "locale": "en-US",
+  "buttons": [
+    {
+      "id": "btn_morning",
+      "label": "morning",
+      "vocalization": "In the morning",
+      "action": ":speak",
+      "background_color": "#FFE4B5"
+    },
+    {
+      "id": "btn_afternoon",
+      "label": "afternoon",
+      "vocalization": "In the afternoon",
+      "action": ":speak",
+      "background_color": "#FFD700"
+    },
+    {
+      "id": "btn_evening",
+      "label": "evening",
+      "vocalization": "In the evening",
+      "action": ":speak",
+      "background_color": "#DDA0DD"
+    },
+    {
+      "id": "btn_night",
+      "label": "night",
+      "vocalization": "At night",
+      "action": ":speak",
+      "background_color": "#4B0082"
+    },
+    {
+      "id": "btn_today",
+      "label": "today",
+      "vocalization": "Today",
+      "action": ":speak",
+      "background_color": "#90EE90"
+    },
+    {
+      "id": "btn_tomorrow",
+      "label": "tomorrow",
+      "vocalization": "Tomorrow",
+      "action": ":speak",
+      "background_color": "#87CEEB"
+    },
+    {
+      "id": "btn_yesterday",
+      "label": "yesterday",
+      "vocalization": "Yesterday",
+      "action": ":speak",
+      "background_color": "#B0C4DE"
+    },
+    {
+      "id": "btn_weekend",
+      "label": "weekend",
+      "vocalization": "On the weekend",
+      "action": ":speak",
+      "background_color": "#FFB6C1"
+    },
+    {
+      "id": "btn_now",
+      "label": "now",
+      "vocalization": "Right now",
+      "action": ":speak",
+      "background_color": "#FF6347"
+    },
+    {
+      "id": "btn_later",
+      "label": "later",
+      "vocalization": "Later",
+      "action": ":speak",
+      "background_color": "#E0FFFF"
+    },
+    {
+      "id": "btn_soon",
+      "label": "soon",
+      "vocalization": "Soon",
+      "action": ":speak",
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_wait",
+      "label": "wait",
+      "vocalization": "Please wait",
+      "action": ":speak",
+      "background_color": "#FFDAB9"
+    },
+    {
+      "id": "btn_back",
+      "label": "Back",
+      "action": ":back",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_home",
+      "label": "Home",
+      "action": ":home",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_core_words_nav",
+      "label": "Core Words",
+      "load_board": {
+        "id": "core-words"
+      },
+      "background_color": "#B0E0E6"
+    },
+    {
+      "id": "btn_love_affection_nav",
+      "label": "Love & Affection",
+      "load_board": {
+        "id": "love-and-affection"
+      },
+      "background_color": "#FFB6C1"
+    }
+  ],
+  "images": [],
+  "sounds": [],
+  "grid": {
+    "rows": 4,
+    "columns": 4,
+    "order": [
+      ["btn_morning", "btn_afternoon", "btn_evening", "btn_night"],
+      ["btn_today", "btn_tomorrow", "btn_yesterday", "btn_weekend"],
+      ["btn_now", "btn_later", "btn_soon", "btn_wait"],
+      ["btn_back", "btn_home", "btn_core_words_nav", "btn_love_affection_nav"]
+    ]
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "format": "open-board-0.1",
+  "id": "feelings",
+  "name": "Feelings & Emotions",
+  "locale": "en-US",
+  "buttons": [
+    {
+      "id": "btn_happy",
+      "label": "happy",
+      "vocalization": "I feel happy",
+      "action": ":speak",
+      "background_color": "#FFD700"
+    },
+    {
+      "id": "btn_sad",
+      "label": "sad",
+      "vocalization": "I feel sad",
+      "action": ":speak",
+      "background_color": "#87CEEB"
+    },
+    {
+      "id": "btn_excited",
+      "label": "excited",
+      "vocalization": "I feel excited",
+      "action": ":speak",
+      "background_color": "#FF69B4"
+    },
+    {
+      "id": "btn_worried",
+      "label": "worried",
+      "vocalization": "I feel worried",
+      "action": ":speak",
+      "background_color": "#DDA0DD"
+    },
+    {
+      "id": "btn_tired",
+      "label": "tired",
+      "vocalization": "I feel tired",
+      "action": ":speak",
+      "background_color": "#B0C4DE"
+    },
+    {
+      "id": "btn_calm",
+      "label": "calm",
+      "vocalization": "I feel calm",
+      "action": ":speak",
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_angry",
+      "label": "angry",
+      "vocalization": "I feel angry",
+      "action": ":speak",
+      "background_color": "#FF6347"
+    },
+    {
+      "id": "btn_scared",
+      "label": "scared",
+      "vocalization": "I feel scared",
+      "action": ":speak",
+      "background_color": "#9370DB"
+    },
+    {
+      "id": "btn_peaceful",
+      "label": "peaceful",
+      "vocalization": "I feel peaceful",
+      "action": ":speak",
+      "background_color": "#E0FFFF"
+    },
+    {
+      "id": "btn_frustrated",
+      "label": "frustrated",
+      "vocalization": "I feel frustrated",
+      "action": ":speak",
+      "background_color": "#FFA07A"
+    },
+    {
+      "id": "btn_proud",
+      "label": "proud",
+      "vocalization": "I feel proud",
+      "action": ":speak",
+      "background_color": "#FFB6C1"
+    },
+    {
+      "id": "btn_shy",
+      "label": "shy",
+      "vocalization": "I feel shy",
+      "action": ":speak",
+      "background_color": "#FFDAB9"
+    },
+    {
+      "id": "btn_back",
+      "label": "Back",
+      "action": ":back",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_home",
+      "label": "Home",
+      "action": ":home",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_core_words_nav",
+      "label": "Core Words",
+      "load_board": {
+        "id": "core-words"
+      },
+      "background_color": "#B0E0E6"
+    },
+    {
+      "id": "btn_love_affection_nav",
+      "label": "Love & Affection",
+      "load_board": {
+        "id": "love-and-affection"
+      },
+      "background_color": "#FFB6C1"
+    }
+  ],
+  "images": [],
+  "sounds": [],
+  "grid": {
+    "rows": 4,
+    "columns": 4,
+    "order": [
+      ["btn_happy", "btn_sad", "btn_excited", "btn_worried"],
+      ["btn_tired", "btn_calm", "btn_angry", "btn_scared"],
+      ["btn_peaceful", "btn_frustrated", "btn_proud", "btn_shy"],
+      ["btn_back", "btn_home", "btn_core_words_nav", "btn_love_affection_nav"]
+    ]
+  }
+}

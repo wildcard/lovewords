@@ -134,18 +134,51 @@
         "id": "core-words"
       },
       "background_color": "#B0E0E6"
+    },
+    {
+      "id": "btn_feelings",
+      "label": "Feelings",
+      "load_board": {
+        "id": "feelings"
+      },
+      "background_color": "#FFD700"
+    },
+    {
+      "id": "btn_activities",
+      "label": "Activities",
+      "load_board": {
+        "id": "activities"
+      },
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_questions",
+      "label": "Questions",
+      "load_board": {
+        "id": "questions"
+      },
+      "background_color": "#DDA0DD"
+    },
+    {
+      "id": "btn_time",
+      "label": "Time",
+      "load_board": {
+        "id": "time"
+      },
+      "background_color": "#87CEEB"
     }
   ],
   "images": [],
   "sounds": [],
   "grid": {
-    "rows": 4,
+    "rows": 5,
     "columns": 4,
     "order": [
       ["btn_love_you", "btn_love_so_much", "btn_favorite", "btn_miss_you"],
       ["btn_thinking", "btn_hug", "btn_kiss", "btn_cuddle"],
       ["btn_beautiful", "btn_lucky", "btn_best_thing", "btn_back"],
-      ["btn_core_words", null, null, null]
+      ["btn_core_words", "btn_feelings", "btn_activities", "btn_questions"],
+      ["btn_time", null, null, null]
     ]
   },
   "license": {
