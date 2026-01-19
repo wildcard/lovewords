@@ -3,7 +3,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import type { Profile, SpeechSettings, DisplaySettings } from '../types/profile';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import type { Profile, SpeechSettings, DisplaySettings, ScanningSettings } from '../types/profile';
 
 export interface SettingsProps {
   /** Current profile settings */
@@ -26,6 +27,7 @@ export function Settings({
   onTestSpeech,
 }: SettingsProps) {
   const [localProfile, setLocalProfile] = useState<Profile>(profile);
+  const dialogRef = useFocusTrap<HTMLDivElement>({ active: true, onEscape: onClose });
 
   // Update local state when profile prop changes
   useEffect(() => {
@@ -50,19 +52,36 @@ export function Settings({
     onChange(updated);
   };
 
+  const updateScanning = (updates: Partial<ScanningSettings>) => {
+    const updated = {
+      ...localProfile,
+      scanning: { ...localProfile.scanning!, ...updates },
+    };
+    setLocalProfile(updated);
+    onChange(updated);
+  };
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
+      role="presentation"
     >
       <div
+        ref={dialogRef}
         className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-title"
+        aria-describedby="settings-description"
       >
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-4 rounded-t-lg">
-          <h2 className="text-2xl font-bold">Settings</h2>
-          <p className="text-sm opacity-90">Customize your LoveWords experience</p>
+          <h2 id="settings-title" className="text-2xl font-bold">Settings</h2>
+          <p id="settings-description" className="text-sm opacity-90">
+            Customize your LoveWords experience
+          </p>
         </div>
 
         {/* Content */}
@@ -246,6 +265,84 @@ export function Settings({
                   Show button images
                 </span>
               </label>
+            </div>
+          </section>
+
+          {/* Accessibility Settings */}
+          <section>
+            <h3 className="text-xl font-semibold mb-4 text-gray-900">Accessibility Settings</h3>
+
+            {/* Switch Scanning Toggle */}
+            <div className="mb-4">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={localProfile.scanning?.enabled ?? false}
+                  onChange={(e) => updateScanning({ enabled: e.target.checked })}
+                  className="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="ml-3 text-sm font-medium text-gray-700">
+                  Enable Switch Scanning
+                </span>
+              </label>
+              <p className="ml-8 mt-1 text-xs text-gray-500">
+                Automatically highlights cells for single-switch access
+              </p>
+            </div>
+
+            {/* Scan Speed Slider */}
+            {localProfile.scanning?.enabled && (
+              <div className="mb-4 ml-8">
+                <label htmlFor="scan-speed-slider" className="block text-sm font-medium text-gray-700 mb-2">
+                  Scan Speed: {((localProfile.scanning.scanSpeed || 2000) / 1000).toFixed(1)}s per cell
+                </label>
+                <input
+                  id="scan-speed-slider"
+                  type="range"
+                  min="500"
+                  max="5000"
+                  step="100"
+                  value={localProfile.scanning.scanSpeed || 2000}
+                  onChange={(e) => updateScanning({ scanSpeed: parseInt(e.target.value) })}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>Fast (0.5s)</span>
+                  <span>Medium (2.5s)</span>
+                  <span>Slow (5s)</span>
+                </div>
+              </div>
+            )}
+          </section>
+
+          {/* Keyboard Shortcuts */}
+          <section>
+            <h3 className="text-xl font-semibold mb-4 text-gray-900">Keyboard Shortcuts</h3>
+            <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+              <div className="flex justify-between items-center py-1">
+                <span className="text-gray-700">Navigate cells</span>
+                <kbd className="px-2 py-1 bg-white border border-gray-300 rounded shadow-sm font-mono">
+                  Arrow Keys
+                </kbd>
+              </div>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-gray-700">Activate cell (or select during scan)</span>
+                <kbd className="px-2 py-1 bg-white border border-gray-300 rounded shadow-sm font-mono">
+                  Enter / Space
+                </kbd>
+              </div>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-gray-700">Skip to main board</span>
+                <kbd className="px-2 py-1 bg-white border border-gray-300 rounded shadow-sm font-mono">
+                  Tab (from page top)
+                </kbd>
+              </div>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-gray-700">Close settings</span>
+                <kbd className="px-2 py-1 bg-white border border-gray-300 rounded shadow-sm font-mono">
+                  Escape
+                </kbd>
+              </div>
             </div>
           </section>
         </div>

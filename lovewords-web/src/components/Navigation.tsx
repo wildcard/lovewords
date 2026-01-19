@@ -13,6 +13,16 @@ export interface NavigationProps {
   onHome: () => void;
   /** Callback for settings button */
   onSettings?: () => void;
+  /** Callback for create board button */
+  onCreateBoard?: () => void;
+  /** Callback to open board library */
+  onOpenBoardLibrary?: () => void;
+  /** Whether current board is a custom board */
+  isCustomBoard?: boolean;
+  /** Whether edit mode is active */
+  isEditMode?: boolean;
+  /** Callback to toggle edit mode */
+  onToggleEditMode?: () => void;
 }
 
 export function Navigation({
@@ -21,6 +31,11 @@ export function Navigation({
   onBack,
   onHome,
   onSettings,
+  onCreateBoard,
+  onOpenBoardLibrary,
+  isCustomBoard,
+  isEditMode,
+  onToggleEditMode,
 }: NavigationProps) {
   return (
     <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-300">
@@ -60,16 +75,51 @@ export function Navigation({
         </ol>
       </nav>
 
-      {onSettings && (
-        <button
-          className="nav-button"
-          onClick={onSettings}
-          aria-label="Open settings"
-          type="button"
-        >
-          ⚙️ Settings
-        </button>
-      )}
+      <div className="flex items-center gap-2">
+        {isCustomBoard && onToggleEditMode && (
+          <button
+            className={`nav-button ${isEditMode ? 'bg-blue-600 text-white' : ''}`}
+            onClick={onToggleEditMode}
+            aria-label={isEditMode ? 'Exit edit mode' : 'Edit board'}
+            type="button"
+          >
+            {isEditMode ? '✓ Done Editing' : '✏️ Edit Board'}
+          </button>
+        )}
+
+        {onOpenBoardLibrary && (
+          <button
+            className="nav-button"
+            onClick={onOpenBoardLibrary}
+            aria-label="View all boards"
+            type="button"
+          >
+            📚 My Boards
+          </button>
+        )}
+
+        {onCreateBoard && (
+          <button
+            className="nav-button"
+            onClick={onCreateBoard}
+            aria-label="Create new board"
+            type="button"
+          >
+            ➕ Create Board
+          </button>
+        )}
+
+        {onSettings && (
+          <button
+            className="nav-button"
+            onClick={onSettings}
+            aria-label="Open settings"
+            type="button"
+          >
+            ⚙️ Settings
+          </button>
+        )}
+      </div>
     </div>
   );
 }

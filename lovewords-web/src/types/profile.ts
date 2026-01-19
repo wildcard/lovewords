@@ -38,14 +38,10 @@ export interface DisplaySettings {
 export interface ScanningSettings {
   /** Enable switch scanning mode */
   enabled: boolean;
-  /** Scan interval in milliseconds */
-  interval: number;
-  /** Number of switch inputs (1 or 2) */
-  switches: 1 | 2;
-  /** Auto-select after timeout */
-  autoSelect: boolean;
-  /** Auto-select timeout in milliseconds */
-  autoSelectTimeout?: number;
+  /** Scan speed in milliseconds (500-5000, default: 2000) */
+  scanSpeed: number;
+  /** Scan pattern (MVP: linear only) */
+  scanPattern: 'linear' | 'row-column';
 }
 
 /**
@@ -65,8 +61,7 @@ export const DEFAULT_PROFILE: Profile = {
   },
   scanning: {
     enabled: false,
-    interval: 1000,
-    switches: 1,
-    autoSelect: false,
+    scanSpeed: 2000, // 2 seconds per cell
+    scanPattern: 'linear',
   },
 };

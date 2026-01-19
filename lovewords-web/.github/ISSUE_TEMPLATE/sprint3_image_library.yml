@@ -1,0 +1,69 @@
+name: "Sprint 3: Image Library"
+description: Create image library for reusing images across boards
+title: "[Sprint 3] Image Library (Reusable Images)"
+labels: ["enhancement", "sprint-3", "feature", "image-management"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Image Library Feature
+
+        Build a centralized image library so users can upload images once and reuse them across multiple boards, reducing localStorage usage.
+
+  - type: checkboxes
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      options:
+        - label: Global image library stored in localStorage
+        - label: Image library UI (modal with grid of images)
+        - label: Upload images to library (not tied to specific board)
+        - label: Browse and select images from library when editing buttons
+        - label: Delete images from library (with usage check)
+        - label: Show which boards use each image
+        - label: Prevent deletion of in-use images (or cascade delete option)
+        - label: Tag/categorize images (optional)
+        - label: Search images by name or tag
+        - label: Display image metadata (size, upload date, usage count)
+        - label: Migrate existing button images to library (one-time migration)
+        - label: Export/import library with boards
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: Technical Implementation
+      value: |
+        ```typescript
+        interface ImageLibrary {
+          images: ImageEntry[];
+        }
+
+        interface ImageEntry {
+          id: string;
+          name: string;
+          data: string; // Base64
+          content_type: string;
+          width: number;
+          height: number;
+          uploaded_at: string;
+          tags: string[];
+          usage_count: number;
+        }
+        ```
+
+  - type: textarea
+    id: ui-components
+    attributes:
+      label: UI Components
+      value: |
+        - ImageLibraryModal.tsx - Grid view of all images
+        - ImagePicker.tsx - Select from library or upload new
+        - Integration with ImageUploader.tsx
+
+  - type: dropdown
+    id: estimated-effort
+    attributes:
+      label: Estimated Effort
+      options:
+        - 3-4 days
+    default: 0

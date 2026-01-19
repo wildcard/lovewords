@@ -1,0 +1,109 @@
+name: "Sprint 3: Board Sharing"
+description: Enable board sharing via shareable links and QR codes
+title: "[Sprint 3] Share Boards via Link or QR Code"
+labels: ["enhancement", "sprint-3", "feature", "sharing"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Board Sharing Feature
+
+        Allow users to share their custom boards with others via a shareable link or QR code, without requiring a backend.
+
+  - type: checkboxes
+    id: share-via-link
+    attributes:
+      label: Share via Link
+      options:
+        - label: Generate shareable link for any custom board
+        - label: Link contains board data encoded in URL (Base64 or compressed)
+        - label: Recipient can import board by opening link
+        - label: Link opens board preview before importing
+        - label: '"Add to My Boards" button after preview'
+        - label: Support for short URLs (optional, requires backend)
+        - label: Copy link to clipboard button
+        - label: Share via email, messaging, social media
+
+  - type: checkboxes
+    id: share-via-qr
+    attributes:
+      label: Share via QR Code
+      options:
+        - label: Generate QR code for board link
+        - label: Display QR code in modal
+        - label: Download QR code as PNG
+        - label: Print-friendly QR code view
+        - label: Scan QR code with mobile device to import board
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: Technical Implementation
+      value: |
+        ```typescript
+        interface ShareOptions {
+          method: 'link' | 'qr';
+          includeImages: boolean;
+          compress: boolean;
+        }
+
+        function generateShareLink(boardId: string, options: ShareOptions): string;
+        // Returns: https://lovewords.app/#/import?board=BASE64_DATA
+
+        function generateQRCode(link: string): string;
+        // Returns: data URL of QR code PNG
+
+        function importFromLink(url: string): Promise<ObfBoard>;
+        ```
+
+        **Implementation Notes:**
+        - Encode board as Base64 JSON in URL fragment
+        - Use LZ-string library for compression
+        - QR code generation via `qrcode` npm package
+        - URL length limit: ~2000 characters
+        - For large boards, show warning and suggest export
+
+        **URL Format:**
+        ```
+        https://lovewords.app/#/import?board=<base64-compressed-obf-json>
+        ```
+
+  - type: textarea
+    id: ui-components
+    attributes:
+      label: UI Components
+      value: |
+        - ShareBoardModal.tsx - Share options (link, QR)
+        - QRCodeDisplay.tsx - QR code with download button
+        - ImportPreview.tsx - Preview board before importing
+        - "🔗 Share Board" button in board library
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      value: |
+        **NPM Packages:**
+        - `qrcode` - QR code generation
+        - `lz-string` - URL compression
+
+        **Depends On:**
+        - Issue #1: Board Export/Import (must be complete first)
+
+  - type: dropdown
+    id: estimated-effort
+    attributes:
+      label: Estimated Effort
+      options:
+        - 3-4 days
+    default: 0
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - High
+        - Medium (After export/import)
+        - Low
+    default: 1

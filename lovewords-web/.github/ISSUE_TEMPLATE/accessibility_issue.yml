@@ -1,0 +1,110 @@
+name: Accessibility Issue
+description: Report an accessibility problem (WCAG, keyboard nav, screen reader, etc.)
+title: "[A11y]: "
+labels: ["accessibility"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping us improve accessibility! Accessibility is our top priority.
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: Accessibility Issue
+      description: Describe the accessibility problem you encountered.
+      placeholder: What accessibility barrier did you experience?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Accessibility Category
+      description: What type of accessibility issue is this?
+      options:
+        - Keyboard navigation
+        - Screen reader compatibility
+        - Switch scanning
+        - Motor accessibility (dwell, touch targets)
+        - Color contrast / visual
+        - Focus management
+        - ARIA labels / semantics
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: assistive-tech
+    attributes:
+      label: Assistive Technology Used
+      description: What assistive technology were you using?
+      options:
+        - Keyboard only
+        - Screen reader (VoiceOver)
+        - Screen reader (NVDA)
+        - Screen reader (JAWS)
+        - Screen reader (Orca)
+        - Switch access device
+        - Eye gaze tracker
+        - Head tracker
+        - Other
+        - None (visual inspection)
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Accessible Behavior
+      description: What should happen to make this accessible?
+      placeholder: It should...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: wcag
+    attributes:
+      label: WCAG Success Criterion (if known)
+      description: Does this violate a specific WCAG criterion?
+      options:
+        - "1.4.3 Contrast (Minimum)"
+        - "2.1.1 Keyboard"
+        - "2.1.2 No Keyboard Trap"
+        - "2.4.3 Focus Order"
+        - "2.4.7 Focus Visible"
+        - "4.1.2 Name, Role, Value"
+        - "4.1.3 Status Messages"
+        - "Not sure"
+        - "Other"
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Impact Severity
+      description: How much does this impact your ability to use LoveWords?
+      options:
+        - Blocker (Cannot use the app at all)
+        - Critical (Major functionality unusable)
+        - High (Significant difficulty using a feature)
+        - Medium (Inconvenient but usable)
+        - Low (Minor issue)
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this accessibility issue?
+      placeholder: |
+        1. Turn on screen reader
+        2. Navigate to...
+        3. Try to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context (browser, device, settings, etc.)
+      placeholder: Any other details?

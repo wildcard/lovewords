@@ -1,0 +1,87 @@
+name: "Sprint 3: Board Templates"
+description: Create pre-built board templates for common AAC scenarios
+title: "[Sprint 3] Board Templates (Emotions, Needs, Activities)"
+labels: ["enhancement", "sprint-3", "feature", "content", "templates"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Board Templates
+
+        Provide users with ready-to-use board templates for common AAC use cases to speed up board creation.
+
+  - type: checkboxes
+    id: template-categories
+    attributes:
+      label: Template Categories
+      options:
+        - label: Emotions (happy, sad, angry, excited, scared) - 20 buttons
+        - label: Basic Needs (hungry, thirsty, tired, bathroom, help) - 16 buttons
+        - label: Activities (play, read, watch TV, go outside) - 20 buttons
+        - label: Social (hello, goodbye, please, thank you) - 12 buttons
+        - label: Medical (pain, medicine, doctor, nurse, emergency) - 16 buttons
+        - label: School (teacher, student, homework, recess, lunch) - 20 buttons
+
+  - type: checkboxes
+    id: features
+    attributes:
+      label: Features
+      options:
+        - label: '"Use Template" option in board creation'
+        - label: Preview template before creating
+        - label: Customize template name/grid size
+        - label: Templates use image library (stock illustrations)
+        - label: Templates stored in public/templates/ as OBF files
+        - label: Search templates by category or keyword
+        - label: Combine multiple templates into one board
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: Technical Implementation
+      value: |
+        ```typescript
+        interface BoardTemplate {
+          id: string;
+          name: string;
+          description: string;
+          category: 'emotions' | 'needs' | 'activities' | 'social' | 'medical' | 'school';
+          preview_image?: string;
+          board: ObfBoard;
+          tags: string[];
+        }
+
+        function loadTemplate(templateId: string): Promise<BoardTemplate>;
+        function createBoardFromTemplate(template: BoardTemplate, customizations: Partial<ObfBoard>): ObfBoard;
+        ```
+
+        **Content Sources:**
+        - Mulberry Symbols (open-source AAC symbols)
+        - ARASAAC (open-source pictograms)
+
+  - type: textarea
+    id: ui-components
+    attributes:
+      label: UI Components
+      value: |
+        - TemplateGallery.tsx - Grid of template previews
+        - TemplatePreview.tsx - Full preview with details
+        - Integration with BoardCreator.tsx
+
+  - type: dropdown
+    id: estimated-effort
+    attributes:
+      label: Estimated Effort
+      options:
+        - 4-5 days (includes content creation)
+    default: 0
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - High (High user value)
+        - Medium
+        - Low
+    default: 0

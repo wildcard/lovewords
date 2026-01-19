@@ -17,12 +17,27 @@ export interface StorageBackend {
   saveProfile(profile: Profile): Promise<void>;
 
   /**
-   * Load a board by ID
+   * Load a board by ID (checks custom boards first, then default boards)
    */
   loadBoard(boardId: string): Promise<ObfBoard | null>;
 
   /**
-   * List all available board IDs
+   * Save a custom board (creates new or updates existing)
+   */
+  saveBoard(board: ObfBoard): Promise<void>;
+
+  /**
+   * Delete a custom board by ID
+   */
+  deleteBoard(boardId: string): Promise<void>;
+
+  /**
+   * List all custom boards
+   */
+  listCustomBoards(): Promise<ObfBoard[]>;
+
+  /**
+   * List all available default board IDs
    */
   listBoards(): Promise<string[]>;
 }

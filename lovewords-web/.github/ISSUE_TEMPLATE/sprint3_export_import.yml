@@ -1,0 +1,90 @@
+name: "Sprint 3: Board Export/Import"
+description: Implement board export/import using OBF format
+title: "[Sprint 3] Board Export/Import (OBF File Format)"
+labels: ["enhancement", "sprint-3", "feature", "export-import"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Board Export/Import Feature
+
+        Enable users to export their custom boards as OBF (Open Board Format) files and import boards from files or URLs.
+
+  - type: checkboxes
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Core requirements for this feature
+      options:
+        - label: Export custom board as .obf JSON file
+        - label: Download exported file to device
+        - label: Import board from .obf file upload
+        - label: Import board from URL (e.g., shared board link)
+        - label: Validate imported OBF format (schema validation)
+        - label: Handle import errors gracefully with user feedback
+        - label: Preserve all board data (buttons, images, grid layout)
+        - label: Base64 images converted correctly on import/export
+        - label: Merge imported board with existing boards (no overwrites)
+        - label: Show import success/failure message
+        - label: Add "📥 Import Board" button in navigation
+        - label: Add "📤 Export Board" option in board library
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: Technical Implementation
+      description: Key technical considerations
+      value: |
+        ```typescript
+        // Export API
+        interface ExportOptions {
+          includeImages: boolean;
+          format: 'obf' | 'obz'; // obf = JSON, obz = compressed
+        }
+
+        function exportBoard(boardId: string, options: ExportOptions): Blob;
+
+        // Import API
+        interface ImportOptions {
+          overwrite: boolean; // if board with same ID exists
+          validateImages: boolean;
+        }
+
+        function importBoard(file: File | string, options: ImportOptions): Promise<ObfBoard>;
+        ```
+
+        **Implementation Notes:**
+        - Use File API for export/import
+        - Validate OBF schema against Open Board Format spec
+        - Consider compression for large boards (.obz format)
+        - Handle duplicate board IDs (append timestamp or prompt user)
+        - Preserve custom extensions (ext_lovewords_*)
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Checklist
+      value: |
+        - [ ] Export board, import in new browser session
+        - [ ] Export board with 20+ images, verify size
+        - [ ] Import board from external source (OBF library)
+        - [ ] Import invalid file, verify error handling
+        - [ ] Import board with duplicate ID
+
+  - type: dropdown
+    id: estimated-effort
+    attributes:
+      label: Estimated Effort
+      options:
+        - 2-3 days
+    default: 0
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - High (Foundation for sharing)
+        - Medium
+        - Low
+    default: 0

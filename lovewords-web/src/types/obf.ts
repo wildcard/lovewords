@@ -14,6 +14,8 @@ export interface ObfBoard {
   locale: string;
   /** Optional HTML description */
   description_html?: string;
+  /** Optional plain text description (for custom boards) */
+  description?: string;
   /** Buttons on this board */
   buttons: ObfButton[];
   /** Images referenced by buttons */
@@ -30,6 +32,12 @@ export interface ObfBoard {
   ext_lovewords_moment?: string;
   /** Emotional warmth categories for the whole board */
   ext_lovewords_warmth?: string[];
+  /** Flag to identify custom (user-created) boards */
+  ext_lovewords_custom?: boolean;
+  /** Timestamp when board was created (ISO 8601) */
+  ext_lovewords_created_at?: string;
+  /** Timestamp when board was last updated (ISO 8601) */
+  ext_lovewords_updated_at?: string;
 }
 
 export interface ObfButton {

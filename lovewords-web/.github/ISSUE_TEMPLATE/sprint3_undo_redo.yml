@@ -1,0 +1,58 @@
+name: "Sprint 3: Undo/Redo System"
+description: Implement undo/redo for board editing actions
+title: "[Sprint 3] Undo/Redo System for Board Editing"
+labels: ["enhancement", "sprint-3", "feature", "ux-improvement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Undo/Redo System
+
+        Add undo/redo functionality for board editing actions to prevent accidental data loss.
+
+  - type: checkboxes
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      options:
+        - label: Undo button in edit mode (⏪ or Ctrl+Z)
+        - label: Redo button in edit mode (⏩ or Ctrl+Y)
+        - label: Undo/redo stack with max 50 actions
+        - label: Actions tracked (button add/edit/delete, drag-and-drop, image upload)
+        - label: Visual feedback (button disabled when no undo/redo available)
+        - label: Clear undo stack on exit edit mode
+        - label: Keyboard shortcuts (Cmd+Z/Ctrl+Z, Cmd+Shift+Z/Ctrl+Y)
+        - label: Show current action description
+        - label: Undo/redo works across page refresh (optional)
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: Technical Implementation
+      value: |
+        ```typescript
+        interface UndoAction {
+          type: 'button-add' | 'button-edit' | 'button-delete' | 'button-reorder';
+          timestamp: string;
+          before: BoardState;
+          after: BoardState;
+          description: string;
+        }
+
+        interface UndoStack {
+          actions: UndoAction[];
+          currentIndex: number;
+        }
+
+        function undo(): void;
+        function redo(): void;
+        function pushAction(action: UndoAction): void;
+        ```
+
+  - type: dropdown
+    id: estimated-effort
+    attributes:
+      label: Estimated Effort
+      options:
+        - 2-3 days
+    default: 0
