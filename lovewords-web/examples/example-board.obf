@@ -1,0 +1,110 @@
+{
+  "format": "open-board-0.1",
+  "id": "example-test-board",
+  "name": "Example Test Board",
+  "locale": "en-US",
+  "description": "A sample board for testing import functionality. Contains common greetings and responses.",
+  "buttons": [
+    {
+      "id": "btn_hello",
+      "label": "Hello",
+      "vocalization": "Hello!",
+      "action": ":speak",
+      "background_color": "#FFB6C1"
+    },
+    {
+      "id": "btn_goodbye",
+      "label": "Goodbye",
+      "vocalization": "Goodbye!",
+      "action": ":speak",
+      "background_color": "#FFB6C1"
+    },
+    {
+      "id": "btn_thank_you",
+      "label": "Thank You",
+      "vocalization": "Thank you!",
+      "action": ":speak",
+      "background_color": "#87CEEB"
+    },
+    {
+      "id": "btn_youre_welcome",
+      "label": "You're Welcome",
+      "vocalization": "You're welcome!",
+      "action": ":speak",
+      "background_color": "#87CEEB"
+    },
+    {
+      "id": "btn_yes",
+      "label": "Yes",
+      "vocalization": "Yes",
+      "action": ":add",
+      "background_color": "#98FB98"
+    },
+    {
+      "id": "btn_no",
+      "label": "No",
+      "vocalization": "No",
+      "action": ":add",
+      "background_color": "#FFA07A"
+    },
+    {
+      "id": "btn_please",
+      "label": "Please",
+      "vocalization": "Please",
+      "action": ":add",
+      "background_color": "#DDA0DD"
+    },
+    {
+      "id": "btn_help",
+      "label": "Help",
+      "vocalization": "I need help",
+      "action": ":speak",
+      "background_color": "#FFD700"
+    },
+    {
+      "id": "btn_back",
+      "label": "← Back",
+      "action": ":back",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_home",
+      "label": "🏠 Home",
+      "action": ":home",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_clear",
+      "label": "Clear",
+      "action": ":clear",
+      "background_color": "#D3D3D3"
+    },
+    {
+      "id": "btn_backspace",
+      "label": "⌫",
+      "action": ":backspace",
+      "background_color": "#D3D3D3"
+    }
+  ],
+  "images": [],
+  "sounds": [],
+  "grid": {
+    "rows": 4,
+    "columns": 4,
+    "order": [
+      ["btn_hello", "btn_goodbye", "btn_thank_you", "btn_youre_welcome"],
+      ["btn_yes", "btn_no", "btn_please", "btn_help"],
+      [null, null, null, null],
+      ["btn_back", "btn_home", "btn_clear", "btn_backspace"]
+    ]
+  },
+  "license": {
+    "type": "CC0 1.0",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "author_name": "LoveWords Project",
+    "author_url": "https://github.com/wildcard/lovewords"
+  },
+  "ext_lovewords_custom": true,
+  "ext_lovewords_moment": "daily",
+  "ext_lovewords_warmth": ["friendly", "polite"]
+}

@@ -9,9 +9,10 @@ This guide covers the technical architecture, development setup, and contributio
 3. [Project Structure](#project-structure)
 4. [Open Board Format (OBF)](#open-board-format-obf)
 5. [Adding New Boards](#adding-new-boards)
-6. [Component API](#component-api)
-7. [Testing](#testing)
-8. [Contributing](#contributing)
+6. [Importing and Exporting Boards](#importing-and-exporting-boards)
+7. [Component API](#component-api)
+8. [Testing](#testing)
+9. [Contributing](#contributing)
 
 ---
 
@@ -297,6 +298,188 @@ npm run dev
 - Include vocalization for screen readers
 - Use high-contrast colors
 - Test with keyboard navigation
+
+---
+
+## Importing and Exporting Boards
+
+LoveWords supports importing and exporting custom boards using the standard Open Board Format (OBF) specification. This enables sharing boards between users and backing up custom configurations.
+
+### Exporting Boards
+
+**From the UI:**
+1. Open "📚 My Boards" from the navigation bar
+2. Find your custom board in the "My Custom Boards" section
+3. Click the green "📤" export button
+4. The board downloads as a `.obf` file
+
+**Programmatically:**
+
+```typescript
+import { downloadBoard } from './utils/board-export';
+
+// Export a board
+downloadBoard(myBoard);
+
+// Export with custom filename
+downloadBoard(myBoard, 'my-custom-board.obf');
+```
+
+**Generated File Format:**
+- Standard OBF JSON format
+- Pretty-printed (human-readable)
+- Filename sanitized from board name
+- MIME type: `application/json`
+
+### Importing Boards
+
+**From File Upload:**
+1. Open "📚 My Boards"
+2. Click "📥 Import Board" button
+3. Select "📁 File Upload" tab
+4. Choose your `.obf` file
+5. Review the board preview
+6. Handle ID collisions (if any)
+7. Click "Import"
+
+**From URL:**
+1. Open "📚 My Boards"
+2. Click "📥 Import Board"
+3. Select "🔗 From URL" tab
+4. Enter the URL to the `.obf` file
+5. Click "Fetch"
+6. Review preview and import
+
+**Programmatically:**
+
+```typescript
+import { importFromFile, importFromUrl, processImportedBoard } from './utils/board-import';
+
+// Import from file
+const file = document.querySelector('input[type="file"]').files[0];
+const result = await importFromFile(file);
+if (result.success && result.board) {
+  const processedBoard = processImportedBoard(
+    result.board,
+    existingBoardIds,
+    'rename' // or 'replace'
+  );
+  await storage.saveBoard(processedBoard);
+}
+
+// Import from URL
+const urlResult = await importFromUrl('https://example.com/board.obf');
+if (urlResult.success && urlResult.board) {
+  await storage.saveBoard(urlResult.board);
+}
+```
+
+### ID Collision Handling
+
+When importing a board with an ID that already exists, you have two options:
+
+**Rename (Keep Both):**
+- Creates a new unique ID by appending a timestamp
+- Original board remains unchanged
+- Imported board gets a new ID like `board-name-1705942800000`
+
+**Replace (Overwrite):**
+- Overwrites the existing board completely
+- Use with caution - this cannot be undone
+- Useful for updating existing boards
+
+### Validation
+
+All imported boards are validated against the OBF specification:
+
+```typescript
+import { validateBoard } from './utils/board-validation';
+
+const validation = validateBoard(data);
+if (validation.valid) {
+  // Board is valid
+  const board = validation.board;
+} else {
+  // Show errors
+  console.error(validation.errors);
+}
+```
+
+**Validation Checks:**
+- ✅ Format version is "open-board-0.1"
+- ✅ Required fields present (id, name, buttons, images, sounds, grid)
+- ✅ Grid dimensions match order array
+- ✅ Button IDs in grid exist in buttons array
+- ✅ Images and sounds have required fields
+- ✅ Structural integrity of all objects
+
+### Error Handling
+
+The import system handles various error cases:
+
+| Error | User Message | Recovery |
+|-------|--------------|----------|
+| Invalid JSON | "The file is not valid JSON." | Fix JSON syntax |
+| Missing fields | "Invalid board format. Missing: id, name" | Add required fields |
+| Grid mismatch | "Grid order has X rows, but grid.rows is Y" | Fix grid dimensions |
+| Invalid button ID | "Grid references unknown button ID" | Add missing button |
+| URL fetch failed | "Could not fetch board from URL." | Check URL, CORS |
+| Storage full | "Storage is full. Delete boards to make room." | Delete old boards |
+
+### Sharing Boards
+
+**Via Direct File:**
+1. Export your board
+2. Share the `.obf` file via email, messaging, etc.
+3. Recipient imports the file
+
+**Via URL:**
+1. Export your board
+2. Upload to:
+   - GitHub gist
+   - File hosting service (Dropbox, Google Drive with public link)
+   - Your own web server
+3. Share the direct URL to the `.obf` file
+4. Recipient uses "Import from URL" feature
+
+**Example GitHub Gist:**
+```bash
+# Create a gist at https://gist.github.com
+# Upload your .obf file
+# Get the "Raw" URL
+# Share: https://gist.githubusercontent.com/user/id/raw/board.obf
+```
+
+### Board Metadata
+
+When importing, these fields are automatically set:
+
+```json
+{
+  "ext_lovewords_custom": true,
+  "ext_lovewords_created_at": "2024-01-22T10:30:00.000Z",
+  "ext_lovewords_updated_at": "2024-01-22T10:30:00.000Z"
+}
+```
+
+If the imported board already has `created_at`, it's preserved. The `updated_at` is always set to the current time.
+
+### Testing Import/Export
+
+See [SPRINT_3_TESTING.md](./SPRINT_3_TESTING.md) for comprehensive testing guide.
+
+**Quick Test:**
+```bash
+# Export a board
+# 1. Create a custom board
+# 2. Click export
+# 3. Verify .obf file downloads
+
+# Import the board
+# 1. Delete the custom board
+# 2. Import the .obf file
+# 3. Verify board is restored
+```
 
 ---
 

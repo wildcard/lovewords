@@ -10,6 +10,7 @@ import { Settings } from './components/Settings';
 import { BoardCreator } from './components/BoardCreator';
 import { ButtonEditor } from './components/ButtonEditor';
 import { BoardLibrary } from './components/BoardLibrary';
+import { ImportModal } from './components/ImportModal';
 import { ScreenReaderAnnouncer } from './components/ScreenReaderAnnouncer';
 import { BoardNavigator } from './core/board-navigator';
 import { getCellAction } from './core/cell-action';
@@ -21,6 +22,7 @@ import { useScanner } from './hooks/useScanner';
 import { LocalStorageBackend, getOrCreateProfile, StorageQuotaError } from './storage/local-storage';
 import { DEFAULT_PROFILE } from './types/profile';
 import type { Profile } from './types/profile';
+import { downloadBoard } from './utils/board-export';
 
 export function App() {
   const [navigator, setNavigator] = useState<BoardNavigator | null>(null);
@@ -30,6 +32,8 @@ export function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [showBoardCreator, setShowBoardCreator] = useState(false);
   const [showBoardLibrary, setShowBoardLibrary] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [existingBoardIds, setExistingBoardIds] = useState<string[]>([]);
   const [editingBoard, setEditingBoard] = useState<ObfBoard | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingCell, setEditingCell] = useState<{ row: number; col: number } | null>(null);
@@ -380,6 +384,43 @@ export function App() {
     }
   }, [navigator, announce]);
 
+  const handleExportBoard = useCallback((board: ObfBoard) => {
+    downloadBoard(board);
+    announce(`Exported ${board.name}`);
+  }, [announce]);
+
+  const handleOpenImportModal = useCallback(async () => {
+    // Load existing board IDs
+    const defaultIds = ['love-and-affection', 'core-words', 'basic-needs'];
+    const customBoards = await storage.current.listCustomBoards();
+    const customIds = customBoards.map(b => b.id);
+    setExistingBoardIds([...defaultIds, ...customIds]);
+    setShowImportModal(true);
+  }, []);
+
+  const handleImportBoard = useCallback(async (board: ObfBoard) => {
+    try {
+      await storage.current.saveBoard(board);
+      announce(`Imported ${board.name}`);
+      setShowImportModal(false);
+
+      // Register board with navigator and navigate to it
+      if (navigator) {
+        navigator.registerBoard(board);
+        if (navigator.navigate(board.id)) {
+          forceUpdate({});
+        }
+      }
+    } catch (error) {
+      console.error('Failed to import board:', error);
+      if (error instanceof StorageQuotaError) {
+        announce(error.message, 'assertive');
+      } else {
+        announce('Failed to import board', 'assertive');
+      }
+    }
+  }, [navigator, announce]);
+
   // Button editing handlers
   const handleSaveButton = useCallback(async (button: ObfButton, row: number, col: number, imageDataUrl?: string) => {
     if (!navigator) return;
@@ -669,8 +710,19 @@ export function App() {
           onNavigateToBoard={handleNavigateToBoard}
           onEditBoard={handleEditBoardMetadata}
           onDeleteBoard={handleDeleteBoard}
+          onExportBoard={handleExportBoard}
+          onImportBoard={handleOpenImportModal}
           onClose={() => setShowBoardLibrary(false)}
           loadAllBoards={loadAllBoards}
+        />
+      )}
+
+      {/* Import modal */}
+      {showImportModal && (
+        <ImportModal
+          onImport={handleImportBoard}
+          onClose={() => setShowImportModal(false)}
+          existingBoardIds={existingBoardIds}
         />
       )}
     </div>

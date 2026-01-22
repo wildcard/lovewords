@@ -12,6 +12,10 @@ export interface BoardLibraryProps {
   onEditBoard?: (board: ObfBoard) => void;
   /** Callback to delete a custom board */
   onDeleteBoard?: (boardId: string) => void;
+  /** Callback to export a board */
+  onExportBoard?: (board: ObfBoard) => void;
+  /** Callback to open import modal */
+  onImportBoard?: () => void;
   /** Callback to close the library */
   onClose: () => void;
   /** Function to load all boards */
@@ -24,9 +28,10 @@ interface BoardItemProps {
   onNavigate: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onExport?: () => void;
 }
 
-function BoardItem({ board, isCustom, onNavigate, onEdit, onDelete }: BoardItemProps) {
+function BoardItem({ board, isCustom, onNavigate, onEdit, onDelete, onExport }: BoardItemProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const buttonCount = board.buttons.length;
@@ -53,8 +58,18 @@ function BoardItem({ board, isCustom, onNavigate, onEdit, onDelete }: BoardItemP
           </div>
         </div>
 
-        {isCustom && (onEdit || onDelete) && (
+        {isCustom && (onEdit || onDelete || onExport) && (
           <div className="flex gap-2 ml-4">
+            {onExport && (
+              <button
+                onClick={onExport}
+                className="p-2 text-green-600 hover:bg-green-50 rounded"
+                aria-label={`Export ${board.name}`}
+                type="button"
+              >
+                📤
+              </button>
+            )}
             {onEdit && (
               <button
                 onClick={onEdit}
@@ -113,6 +128,8 @@ export function BoardLibrary({
   onNavigateToBoard,
   onEditBoard,
   onDeleteBoard,
+  onExportBoard,
+  onImportBoard,
   onClose,
   loadAllBoards,
 }: BoardLibraryProps) {
@@ -168,14 +185,26 @@ export function BoardLibrary({
             <h2 id="board-library-title" className="text-2xl font-bold">
               My Boards
             </h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded"
-              aria-label="Close board library"
-              type="button"
-            >
-              ✕
-            </button>
+            <div className="flex items-center gap-2">
+              {onImportBoard && (
+                <button
+                  onClick={onImportBoard}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+                  aria-label="Import board"
+                  type="button"
+                >
+                  📥 Import Board
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded"
+                aria-label="Close board library"
+                type="button"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {/* Search */}
@@ -248,6 +277,11 @@ export function BoardLibrary({
                           onNavigateToBoard(board.id);
                           onClose();
                         }}
+                        onExport={
+                          onExportBoard
+                            ? () => onExportBoard(board)
+                            : undefined
+                        }
                         onEdit={
                           onEditBoard
                             ? () => {
