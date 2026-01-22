@@ -12,6 +12,24 @@
 
 ---
 
+## ✨ Recent Updates
+
+### Sprint 3 Complete: Board Export/Import (January 2024)
+
+You can now **export and import boards** using the standard Open Board Format (OBF):
+
+- 📤 **Export custom boards** as `.obf` files for backup and sharing
+- 📥 **Import boards** from local files or URLs
+- 🔄 **Share boards** with family, therapists, and the community
+- ✅ **Full OBF validation** ensures compatibility
+- 💾 **Backup and restore** your boards across devices
+
+**Try it:** Create a custom board, click the export button (📤), and share it with others!
+
+See [Sprint 3 completion report](lovewords-web/.github/SPRINT_3_COMPLETION.md) for full details.
+
+---
+
 ## Who It's For
 
 - **AAC users** who want fast access to relationship language—including nonspeaking and minimally speaking autistic people
@@ -50,7 +68,12 @@ LoveWords provides simple, dependable communication boards focused on relationsh
 - **Missing Someone** — *I miss you, wish you were here, thinking of you*
 - **Moments** — Quick boards for bedtime, goodbye, celebration, and overwhelm
 
-Personalize with photos of your people, recorded messages in familiar voices, and phrases that fit your family.
+**Customize and Share:**
+- Create custom boards with your own vocabulary
+- Add photos of family members and familiar places
+- Export boards to share with caregivers and therapists
+- Import community boards or create your own library
+- Switch scanning for accessible navigation
 
 ---
 
