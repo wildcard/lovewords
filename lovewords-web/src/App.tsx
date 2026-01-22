@@ -24,7 +24,7 @@ import { useDragDrop } from './hooks/useDragDrop';
 import { LocalStorageBackend, getOrCreateProfile, StorageQuotaError } from './storage/local-storage';
 import { DEFAULT_PROFILE } from './types/profile';
 import type { Profile } from './types/profile';
-import { downloadBoard } from './utils/board-export';
+import { downloadBoard, exportAllBoards } from './utils/board-export';
 
 export function App() {
   const [navigator, setNavigator] = useState<BoardNavigator | null>(null);
@@ -415,6 +415,22 @@ export function App() {
     announce(`Exported ${board.name}`);
   }, [announce]);
 
+  const handleExportAllBoards = useCallback(async (boards: ObfBoard[]) => {
+    try {
+      announce(`Exporting ${boards.length} boards...`);
+
+      await exportAllBoards(boards, (progress) => {
+        // Progress updates (0-100)
+        if (progress === 100) {
+          announce(`Exported ${boards.length} boards successfully`);
+        }
+      });
+    } catch (error) {
+      console.error('Failed to export all boards:', error);
+      announce('Failed to export boards', 'assertive');
+    }
+  }, [announce]);
+
   const handleOpenImportModal = useCallback(async () => {
     // Load existing board IDs
     const defaultIds = ['love-and-affection', 'core-words', 'basic-needs'];
@@ -740,6 +756,7 @@ export function App() {
           onEditBoard={handleEditBoardMetadata}
           onDeleteBoard={handleDeleteBoard}
           onExportBoard={handleExportBoard}
+          onExportAllBoards={handleExportAllBoards}
           onImportBoard={handleOpenImportModal}
           onClose={() => setShowBoardLibrary(false)}
           loadAllBoards={loadAllBoards}

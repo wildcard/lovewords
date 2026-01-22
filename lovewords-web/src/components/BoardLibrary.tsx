@@ -14,6 +14,8 @@ export interface BoardLibraryProps {
   onDeleteBoard?: (boardId: string) => void;
   /** Callback to export a board */
   onExportBoard?: (board: ObfBoard) => void;
+  /** Callback to export all custom boards as ZIP */
+  onExportAllBoards?: (boards: ObfBoard[]) => void;
   /** Callback to open import modal */
   onImportBoard?: () => void;
   /** Callback to close the library */
@@ -129,6 +131,7 @@ export function BoardLibrary({
   onEditBoard,
   onDeleteBoard,
   onExportBoard,
+  onExportAllBoards,
   onImportBoard,
   onClose,
   loadAllBoards,
@@ -186,6 +189,16 @@ export function BoardLibrary({
               My Boards
             </h2>
             <div className="flex items-center gap-2">
+              {onExportAllBoards && customBoards.length > 0 && (
+                <button
+                  onClick={() => onExportAllBoards(customBoards)}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
+                  aria-label={`Export all ${customBoards.length} custom boards`}
+                  type="button"
+                >
+                  📦 Export All ({customBoards.length})
+                </button>
+              )}
               {onImportBoard && (
                 <button
                   onClick={onImportBoard}
