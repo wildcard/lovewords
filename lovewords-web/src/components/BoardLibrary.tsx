@@ -2,8 +2,19 @@
  * BoardLibrary component - displays all available boards
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { ObfBoard } from '../types/obf';
+import type { BoardFilters, BoardSort } from '../types/board-filters';
+import { DEFAULT_FILTERS, DEFAULT_SORT } from '../types/board-filters';
+import {
+  applyFilters,
+  sortBoards,
+  getAvailableGridSizes,
+  loadFiltersFromStorage,
+  saveFiltersToStorage,
+  loadSortFromStorage,
+  saveSortToStorage,
+} from '../utils/board-filtering';
 
 export interface BoardLibraryProps {
   /** Callback to navigate to a board */
@@ -141,6 +152,17 @@ export function BoardLibrary({
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Load filters and sort from localStorage
+  const [filters, setFilters] = useState<BoardFilters>(() => {
+    const saved = loadFiltersFromStorage();
+    return saved ? { ...DEFAULT_FILTERS, ...saved } : DEFAULT_FILTERS;
+  });
+
+  const [sort, setSort] = useState<BoardSort>(() => {
+    return loadSortFromStorage() || DEFAULT_SORT;
+  });
 
   // Load boards on mount
   useEffect(() => {
@@ -160,19 +182,51 @@ export function BoardLibrary({
     loadBoards();
   }, [loadAllBoards]);
 
-  // Filter boards by search query
-  const filterBoards = (boards: ObfBoard[]) => {
-    if (!searchQuery.trim()) return boards;
+  // Save filters when they change
+  useEffect(() => {
+    saveFiltersToStorage(filters);
+  }, [filters]);
 
-    const query = searchQuery.toLowerCase();
-    return boards.filter(board =>
-      board.name.toLowerCase().includes(query) ||
-      board.description?.toLowerCase().includes(query)
-    );
+  // Save sort when it changes
+  useEffect(() => {
+    saveSortToStorage(sort);
+  }, [sort]);
+
+  // Get available grid sizes from all boards
+  const availableGridSizes = useMemo(() => {
+    return getAvailableGridSizes([...defaultBoards, ...customBoards]);
+  }, [defaultBoards, customBoards]);
+
+  // Apply filters and sorting
+  const filteredDefaults = useMemo(() => {
+    if (!filters.showDefault) return [];
+    const filtered = applyFilters(defaultBoards, filters, searchQuery);
+    return sortBoards(filtered, sort);
+  }, [defaultBoards, filters, searchQuery, sort]);
+
+  const filteredCustom = useMemo(() => {
+    if (!filters.showCustom) return [];
+    const filtered = applyFilters(customBoards, filters, searchQuery);
+    return sortBoards(filtered, sort);
+  }, [customBoards, filters, searchQuery, sort]);
+
+  const totalCount = defaultBoards.length + customBoards.length;
+  const filteredCount = filteredDefaults.length + filteredCustom.length;
+
+  // Check if any filters are active
+  const hasActiveFilters =
+    filters.gridSizes.length > 0 ||
+    filters.dateRange !== 'all' ||
+    filters.buttonCountRange !== null ||
+    !filters.showDefault ||
+    !filters.showCustom ||
+    searchQuery.trim() !== '';
+
+  // Clear all filters
+  const handleClearFilters = () => {
+    setFilters(DEFAULT_FILTERS);
+    setSearchQuery('');
   };
-
-  const filteredDefaults = filterBoards(defaultBoards);
-  const filteredCustom = filterBoards(customBoards);
 
   return (
     <div
@@ -220,19 +274,164 @@ export function BoardLibrary({
             </div>
           </div>
 
-          {/* Search */}
-          <div className="relative">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search boards..."
-              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md"
-              aria-label="Search boards"
-            />
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              🔍
-            </span>
+          {/* Search and Filters */}
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search boards..."
+                  className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md"
+                  aria-label="Search boards"
+                />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  🔍
+                </span>
+              </div>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`px-4 py-2 border rounded-md transition-colors ${
+                  showFilters
+                    ? 'bg-blue-50 border-blue-300 text-blue-700'
+                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+                aria-label="Toggle filters"
+                type="button"
+              >
+                🔽 Filters
+              </button>
+            </div>
+
+            {/* Filter Panel */}
+            {showFilters && (
+              <div className="p-4 bg-gray-50 rounded-md border border-gray-200 space-y-4">
+                {/* Board Type Toggles */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Board Types
+                  </label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filters.showDefault}
+                        onChange={(e) =>
+                          setFilters({ ...filters, showDefault: e.target.checked })
+                        }
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm">Default Boards</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filters.showCustom}
+                        onChange={(e) =>
+                          setFilters({ ...filters, showCustom: e.target.checked })
+                        }
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm">Custom Boards</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Grid Size Filter */}
+                {availableGridSizes.length > 0 && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Grid Size
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {availableGridSizes.map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => {
+                            const isSelected = filters.gridSizes.includes(size);
+                            setFilters({
+                              ...filters,
+                              gridSizes: isSelected
+                                ? filters.gridSizes.filter((s) => s !== size)
+                                : [...filters.gridSizes, size],
+                            });
+                          }}
+                          className={`px-3 py-1 text-sm rounded border transition-colors ${
+                            filters.gridSizes.includes(size)
+                              ? 'bg-blue-100 border-blue-300 text-blue-700'
+                              : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                          }`}
+                          type="button"
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Date Range Filter */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Created
+                  </label>
+                  <select
+                    value={filters.dateRange}
+                    onChange={(e) =>
+                      setFilters({
+                        ...filters,
+                        dateRange: e.target.value as BoardFilters['dateRange'],
+                      })
+                    }
+                    className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  >
+                    <option value="all">All time</option>
+                    <option value="week">Last week</option>
+                    <option value="month">Last month</option>
+                  </select>
+                </div>
+
+                {/* Clear Filters */}
+                {hasActiveFilters && (
+                  <button
+                    onClick={handleClearFilters}
+                    className="text-sm text-blue-600 hover:text-blue-700 underline"
+                    type="button"
+                  >
+                    Clear all filters
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Results Count and Sort */}
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">
+                Showing {filteredCount} of {totalCount} boards
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-600">Sort by:</span>
+                <select
+                  value={`${sort.field}-${sort.order}`}
+                  onChange={(e) => {
+                    const [field, order] = e.target.value.split('-') as [
+                      BoardSort['field'],
+                      BoardSort['order']
+                    ];
+                    setSort({ field, order });
+                  }}
+                  className="px-2 py-1 border border-gray-300 rounded text-sm"
+                >
+                  <option value="name-asc">Name (A-Z)</option>
+                  <option value="name-desc">Name (Z-A)</option>
+                  <option value="created-desc">Newest first</option>
+                  <option value="created-asc">Oldest first</option>
+                  <option value="buttons-asc">Fewest buttons</option>
+                  <option value="buttons-desc">Most buttons</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -244,81 +443,91 @@ export function BoardLibrary({
             <div className="text-center text-red-600 py-8">{error}</div>
           ) : (
             <>
-              {/* Default Boards */}
-              <section className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  Default Boards
-                </h3>
-                {filteredDefaults.length === 0 ? (
-                  <p className="text-gray-500 text-sm">No default boards found</p>
-                ) : (
-                  <div className="grid gap-3">
-                    {filteredDefaults.map((board) => (
-                      <BoardItem
-                        key={board.id}
-                        board={board}
-                        isCustom={false}
-                        onNavigate={() => {
-                          onNavigateToBoard(board.id);
-                          onClose();
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </section>
+              {/* No results message */}
+              {filteredDefaults.length === 0 && filteredCustom.length === 0 ? (
+                <div className="text-center text-gray-600 py-8">
+                  <p className="mb-2">No boards match your filters.</p>
+                  {hasActiveFilters && (
+                    <button
+                      onClick={handleClearFilters}
+                      className="text-blue-600 hover:text-blue-700 underline text-sm"
+                      type="button"
+                    >
+                      Clear filters
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {/* Default Boards */}
+                  {filters.showDefault && filteredDefaults.length > 0 && (
+                    <section className="mb-8">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                        Default Boards
+                      </h3>
+                      <div className="grid gap-3">
+                        {filteredDefaults.map((board) => (
+                          <BoardItem
+                            key={board.id}
+                            board={board}
+                            isCustom={false}
+                            onNavigate={() => {
+                              onNavigateToBoard(board.id);
+                              onClose();
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  )}
 
-              {/* Custom Boards */}
-              <section>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  My Custom Boards
-                </h3>
-                {filteredCustom.length === 0 ? (
-                  <p className="text-gray-500 text-sm">
-                    {searchQuery
-                      ? 'No custom boards match your search'
-                      : 'No custom boards yet. Create one to get started!'}
-                  </p>
-                ) : (
-                  <div className="grid gap-3">
-                    {filteredCustom.map((board) => (
-                      <BoardItem
-                        key={board.id}
-                        board={board}
-                        isCustom={true}
-                        onNavigate={() => {
-                          onNavigateToBoard(board.id);
-                          onClose();
-                        }}
-                        onExport={
-                          onExportBoard
-                            ? () => onExportBoard(board)
-                            : undefined
-                        }
-                        onEdit={
-                          onEditBoard
-                            ? () => {
-                                onEditBoard(board);
-                                onClose();
-                              }
-                            : undefined
-                        }
-                        onDelete={
-                          onDeleteBoard
-                            ? () => {
-                                onDeleteBoard(board.id);
-                                // Reload boards after deletion
-                                loadAllBoards().then(({ custom }) => {
-                                  setCustomBoards(custom);
-                                });
-                              }
-                            : undefined
-                        }
-                      />
-                    ))}
-                  </div>
-                )}
-              </section>
+                  {/* Custom Boards */}
+                  {filters.showCustom && filteredCustom.length > 0 && (
+                    <section>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                        My Custom Boards
+                      </h3>
+                      <div className="grid gap-3">
+                        {filteredCustom.map((board) => (
+                          <BoardItem
+                            key={board.id}
+                            board={board}
+                            isCustom={true}
+                            onNavigate={() => {
+                              onNavigateToBoard(board.id);
+                              onClose();
+                            }}
+                            onExport={
+                              onExportBoard
+                                ? () => onExportBoard(board)
+                                : undefined
+                            }
+                            onEdit={
+                              onEditBoard
+                                ? () => {
+                                    onEditBoard(board);
+                                    onClose();
+                                  }
+                                : undefined
+                            }
+                            onDelete={
+                              onDeleteBoard
+                                ? () => {
+                                    onDeleteBoard(board.id);
+                                    // Reload boards after deletion
+                                    loadAllBoards().then(({ custom }) => {
+                                      setCustomBoards(custom);
+                                    });
+                                  }
+                                : undefined
+                            }
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                </>
+              )}
             </>
           )}
         </div>
