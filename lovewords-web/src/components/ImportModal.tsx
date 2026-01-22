@@ -14,18 +14,21 @@ export interface ImportModalProps {
   onClose: () => void;
   /** Existing board IDs for collision detection */
   existingBoardIds: string[];
+  /** Optional files to import (from drag-and-drop) */
+  pendingFiles?: File[];
 }
 
 type ImportMode = 'file' | 'url';
 type CollisionStrategy = 'rename' | 'replace';
 
-export function ImportModal({ onImport, onClose, existingBoardIds }: ImportModalProps) {
+export function ImportModal({ onImport, onClose, existingBoardIds, pendingFiles }: ImportModalProps) {
   const [mode, setMode] = useState<ImportMode>('file');
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [importedBoard, setImportedBoard] = useState<ObfBoard | null>(null);
   const [collisionStrategy, setCollisionStrategy] = useState<CollisionStrategy>('rename');
+  const [currentFileIndex, setCurrentFileIndex] = useState(0);
 
   const dialogRef = useFocusTrap<HTMLDivElement>({ active: true, onEscape: onClose });
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -41,6 +44,14 @@ export function ImportModal({ onImport, onClose, existingBoardIds }: ImportModal
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
+
+  // Auto-load first pending file from drag-and-drop
+  useEffect(() => {
+    if (pendingFiles && pendingFiles.length > 0 && currentFileIndex < pendingFiles.length && !importedBoard && !loading) {
+      const file = pendingFiles[currentFileIndex];
+      handleFileSelect({ target: { files: [file] } } as any);
+    }
+  }, [pendingFiles, currentFileIndex, importedBoard, loading]);
 
   const hasCollision = importedBoard ? hasIdCollision(importedBoard.id, existingBoardIds) : false;
 
@@ -99,6 +110,17 @@ export function ImportModal({ onImport, onClose, existingBoardIds }: ImportModal
     );
 
     onImport(processedBoard);
+
+    // If there are more pending files, move to next file
+    if (pendingFiles && currentFileIndex < pendingFiles.length - 1) {
+      setCurrentFileIndex(prev => prev + 1);
+      setImportedBoard(null);
+      setError(null);
+      setCollisionStrategy('rename');
+    } else {
+      // No more files, close modal
+      onClose();
+    }
   };
 
   const handleModeChange = (newMode: ImportMode) => {
@@ -122,9 +144,16 @@ export function ImportModal({ onImport, onClose, existingBoardIds }: ImportModal
         {/* Header */}
         <div className="p-6 border-b border-gray-300">
           <div className="flex items-center justify-between">
-            <h2 id="import-modal-title" className="text-2xl font-bold">
-              Import Board
-            </h2>
+            <div>
+              <h2 id="import-modal-title" className="text-2xl font-bold">
+                Import Board
+              </h2>
+              {pendingFiles && pendingFiles.length > 1 && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Importing {currentFileIndex + 1} of {pendingFiles.length} boards
+                </p>
+              )}
+            </div>
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded"

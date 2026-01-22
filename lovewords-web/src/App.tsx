@@ -11,6 +11,7 @@ import { BoardCreator } from './components/BoardCreator';
 import { ButtonEditor } from './components/ButtonEditor';
 import { BoardLibrary } from './components/BoardLibrary';
 import { ImportModal } from './components/ImportModal';
+import { DragOverlay } from './components/DragOverlay';
 import { ScreenReaderAnnouncer } from './components/ScreenReaderAnnouncer';
 import { BoardNavigator } from './core/board-navigator';
 import { getCellAction } from './core/cell-action';
@@ -19,6 +20,7 @@ import type { ObfBoard, ObfButton } from './types/obf';
 import { useSpeech } from './hooks/useSpeech';
 import { useAnnouncer } from './hooks/useAnnouncer';
 import { useScanner } from './hooks/useScanner';
+import { useDragDrop } from './hooks/useDragDrop';
 import { LocalStorageBackend, getOrCreateProfile, StorageQuotaError } from './storage/local-storage';
 import { DEFAULT_PROFILE } from './types/profile';
 import type { Profile } from './types/profile';
@@ -34,6 +36,7 @@ export function App() {
   const [showBoardLibrary, setShowBoardLibrary] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [existingBoardIds, setExistingBoardIds] = useState<string[]>([]);
+  const [pendingImportFiles, setPendingImportFiles] = useState<File[]>([]);
   const [editingBoard, setEditingBoard] = useState<ObfBoard | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingCell, setEditingCell] = useState<{ row: number; col: number } | null>(null);
@@ -43,6 +46,29 @@ export function App() {
   const storage = useRef(new LocalStorageBackend());
   const { speak, isSpeaking, voices } = useSpeech(profile.speech);
   const { announcement, announce } = useAnnouncer();
+
+  // Drag-and-drop file import
+  const handleFileDrop = useCallback(async (files: File[]) => {
+    announce(`Importing ${files.length} board${files.length > 1 ? 's' : ''}...`);
+
+    // Store files for processing
+    setPendingImportFiles(files);
+
+    // Load existing board IDs for collision detection
+    const defaultIds = ['love-and-affection', 'core-words', 'basic-needs'];
+    const customBoards = await storage.current.listCustomBoards();
+    const customIds = customBoards.map(b => b.id);
+    setExistingBoardIds([...defaultIds, ...customIds]);
+
+    // Open import modal
+    setShowImportModal(true);
+  }, [announce]);
+
+  const { isDragging } = useDragDrop({
+    onDrop: handleFileDrop,
+    accept: ['.obf', '.json'],
+    enabled: !showImportModal && !showSettings && !showBoardCreator && !showBoardLibrary,
+  });
 
   // Stable callback reference for useScanner (avoids circular dependency)
   const handleCellClickRef = useRef<(row: number, col: number) => void>(() => {});
@@ -607,6 +633,9 @@ export function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Drag-and-drop overlay */}
+      <DragOverlay visible={isDragging} />
+
       {/* Skip to main content link for keyboard users */}
       <a href="#main-content" className="skip-link">
         Skip to communication board
@@ -721,8 +750,12 @@ export function App() {
       {showImportModal && (
         <ImportModal
           onImport={handleImportBoard}
-          onClose={() => setShowImportModal(false)}
+          onClose={() => {
+            setShowImportModal(false);
+            setPendingImportFiles([]);
+          }}
           existingBoardIds={existingBoardIds}
+          pendingFiles={pendingImportFiles.length > 0 ? pendingImportFiles : undefined}
         />
       )}
     </div>
