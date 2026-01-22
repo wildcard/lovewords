@@ -11,6 +11,7 @@ import { BoardCreator } from './components/BoardCreator';
 import { ButtonEditor } from './components/ButtonEditor';
 import { BoardLibrary } from './components/BoardLibrary';
 import { ImportModal } from './components/ImportModal';
+import { ShareModal } from './components/ShareModal';
 import { DragOverlay } from './components/DragOverlay';
 import { ScreenReaderAnnouncer } from './components/ScreenReaderAnnouncer';
 import { BoardNavigator } from './core/board-navigator';
@@ -35,6 +36,8 @@ export function App() {
   const [showBoardCreator, setShowBoardCreator] = useState(false);
   const [showBoardLibrary, setShowBoardLibrary] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [boardToShare, setBoardToShare] = useState<ObfBoard | null>(null);
   const [existingBoardIds, setExistingBoardIds] = useState<string[]>([]);
   const [pendingImportFiles, setPendingImportFiles] = useState<File[]>([]);
   const [editingBoard, setEditingBoard] = useState<ObfBoard | null>(null);
@@ -67,7 +70,7 @@ export function App() {
   const { isDragging } = useDragDrop({
     onDrop: handleFileDrop,
     accept: ['.obf', '.json'],
-    enabled: !showImportModal && !showSettings && !showBoardCreator && !showBoardLibrary,
+    enabled: !showImportModal && !showShareModal && !showSettings && !showBoardCreator && !showBoardLibrary,
   });
 
   // Stable callback reference for useScanner (avoids circular dependency)
@@ -431,6 +434,11 @@ export function App() {
     }
   }, [announce]);
 
+  const handleShareBoard = useCallback((board: ObfBoard) => {
+    setBoardToShare(board);
+    setShowShareModal(true);
+  }, []);
+
   const handleOpenImportModal = useCallback(async () => {
     // Load existing board IDs
     const defaultIds = ['love-and-affection', 'core-words', 'basic-needs'];
@@ -756,6 +764,7 @@ export function App() {
           onEditBoard={handleEditBoardMetadata}
           onDeleteBoard={handleDeleteBoard}
           onExportBoard={handleExportBoard}
+          onShareBoard={handleShareBoard}
           onExportAllBoards={handleExportAllBoards}
           onImportBoard={handleOpenImportModal}
           onClose={() => setShowBoardLibrary(false)}
@@ -773,6 +782,17 @@ export function App() {
           }}
           existingBoardIds={existingBoardIds}
           pendingFiles={pendingImportFiles.length > 0 ? pendingImportFiles : undefined}
+        />
+      )}
+
+      {/* Share modal */}
+      {showShareModal && boardToShare && (
+        <ShareModal
+          board={boardToShare}
+          onClose={() => {
+            setShowShareModal(false);
+            setBoardToShare(null);
+          }}
         />
       )}
     </div>

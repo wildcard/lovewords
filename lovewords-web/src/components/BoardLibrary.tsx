@@ -25,6 +25,8 @@ export interface BoardLibraryProps {
   onDeleteBoard?: (boardId: string) => void;
   /** Callback to export a board */
   onExportBoard?: (board: ObfBoard) => void;
+  /** Callback to share a board */
+  onShareBoard?: (board: ObfBoard) => void;
   /** Callback to export all custom boards as ZIP */
   onExportAllBoards?: (boards: ObfBoard[]) => void;
   /** Callback to open import modal */
@@ -42,9 +44,10 @@ interface BoardItemProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onExport?: () => void;
+  onShare?: () => void;
 }
 
-function BoardItem({ board, isCustom, onNavigate, onEdit, onDelete, onExport }: BoardItemProps) {
+function BoardItem({ board, isCustom, onNavigate, onEdit, onDelete, onExport, onShare }: BoardItemProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const buttonCount = board.buttons.length;
@@ -71,8 +74,18 @@ function BoardItem({ board, isCustom, onNavigate, onEdit, onDelete, onExport }: 
           </div>
         </div>
 
-        {isCustom && (onEdit || onDelete || onExport) && (
+        {isCustom && (onEdit || onDelete || onExport || onShare) && (
           <div className="flex gap-2 ml-4">
+            {onShare && (
+              <button
+                onClick={onShare}
+                className="p-2 text-purple-600 hover:bg-purple-50 rounded"
+                aria-label={`Share ${board.name}`}
+                type="button"
+              >
+                🔗
+              </button>
+            )}
             {onExport && (
               <button
                 onClick={onExport}
@@ -142,6 +155,7 @@ export function BoardLibrary({
   onEditBoard,
   onDeleteBoard,
   onExportBoard,
+  onShareBoard,
   onExportAllBoards,
   onImportBoard,
   onClose,
@@ -497,6 +511,14 @@ export function BoardLibrary({
                               onNavigateToBoard(board.id);
                               onClose();
                             }}
+                            onShare={
+                              onShareBoard
+                                ? () => {
+                                    onShareBoard(board);
+                                    onClose();
+                                  }
+                                : undefined
+                            }
                             onExport={
                               onExportBoard
                                 ? () => onExportBoard(board)
