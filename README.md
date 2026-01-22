@@ -14,17 +14,36 @@
 
 ## ✨ Recent Updates
 
-### Sprint 3 Complete: Board Export/Import (January 2024)
+### Sprint 4 Complete: Polish & Sharing (January 2026)
 
-You can now **export and import boards** using the standard Open Board Format (OBF):
+Major UX improvements to make LoveWords easier to use and share:
+
+- 🎯 **Drag-and-drop import** — Drop `.obf` files anywhere to import boards
+- 📦 **Export all boards** — Backup your entire collection as a single ZIP file
+- 🔍 **Enhanced search and filter** — Find boards quickly by grid size, date, or type
+- 🔗 **Share via link or QR code** — Share boards instantly without file transfers
+- ⚡ **Better board management** — Sort, filter, and organize large collections
+
+**New capabilities:**
+- Drop multiple board files at once for batch import
+- Export all custom boards with one click (includes manifest)
+- Filter boards by 3×3, 4×4, 5×4, 6×6 grid sizes
+- Sort by name, date, or button count
+- Generate shareable links and QR codes (no backend needed!)
+- Preferences persist across sessions
+
+**Try it:** Import boards by dragging them onto the window, filter by grid size, or click the share button (🔗) to generate a QR code!
+
+See [Development Log](lovewords-web/docs/DEVELOPMENT_LOG.md) for full technical details.
+
+### Sprint 3 Complete: Board Export/Import (January 2026)
+
+Foundation for board portability using the standard Open Board Format (OBF):
 
 - 📤 **Export custom boards** as `.obf` files for backup and sharing
 - 📥 **Import boards** from local files or URLs
-- 🔄 **Share boards** with family, therapists, and the community
 - ✅ **Full OBF validation** ensures compatibility
 - 💾 **Backup and restore** your boards across devices
-
-**Try it:** Create a custom board, click the export button (📤), and share it with others!
 
 See [Sprint 3 completion report](lovewords-web/.github/SPRINT_3_COMPLETION.md) for full details.
 
@@ -71,8 +90,11 @@ LoveWords provides simple, dependable communication boards focused on relationsh
 **Customize and Share:**
 - Create custom boards with your own vocabulary
 - Add photos of family members and familiar places
-- Export boards to share with caregivers and therapists
-- Import community boards or create your own library
+- Drag-and-drop to import multiple boards at once
+- Export single boards or your entire collection as ZIP
+- Share boards via link or QR code (instant, no files needed)
+- Search, filter, and sort large board collections
+- Import boards from URLs, files, or QR codes
 - Switch scanning for accessible navigation
 
 ---
