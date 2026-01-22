@@ -9,57 +9,54 @@ status: completed
 
 ## Ledger
 <!-- This section is extracted by SessionStart hook for quick resume -->
-**Updated:** 2026-01-22T18:00:00Z
-**Goal:** Sprint 4 Complete - 3 of 4 issues delivered ✅
+**Updated:** 2026-01-22T20:30:00Z
+**Goal:** Issue #26 - Community Board Repository (Phases 1-5 complete)
 **Branch:** main
 **Test:** npm run build && npm run typecheck ✅
 
 ### Now
-[✓] Sprint 4 COMPLETE - Issues #23, #24, #25, #22 delivered
+[→] Issue #26: Community Board Repository - Frontend complete, needs repo setup
 
 ### This Session
 - [x] Sprint 3 complete and merged
-- [x] Sprint 4 Issue #23 - Drag-and-Drop Import ✅
-- [x] Sprint 4 Issue #24 - Export All Boards as ZIP ✅
-  - [x] Installed JSZip dependency
-  - [x] Added exportAllBoards function with progress callback
-  - [x] Added manifest.json generation
-  - [x] Added "Export All (N)" button to BoardLibrary
-  - [x] Integrated with App.tsx
-  - [x] Build succeeds (350.80 KB bundle, 107.68 KB gzipped)
-  - [x] TypeScript typecheck passes
-  - [x] Testing guide created
-- [x] Sprint 4 Issue #25 - Enhanced Search/Filter ✅
-  - [x] Created board-filters.ts types
-  - [x] Created board-filtering.ts utilities
-  - [x] Collapsible filter panel
-  - [x] Filter by grid size, date, board type
-  - [x] 6 sort options (name, date, button count)
-  - [x] Results count display
-  - [x] Clear filters button
-  - [x] Persistent preferences via localStorage
-  - [x] Build succeeds (356.30 KB bundle, 108.93 KB gzipped)
-- [x] Sprint 4 Issue #22 - Share Boards via Link/QR Code ✅
-  - [x] Installed lz-string, qrcode, @types/qrcode
-  - [x] Created board-sharing.ts utilities
-  - [x] Created ShareModal component
-  - [x] Generate shareable links with compression
-  - [x] QR code generation (256x256px)
-  - [x] Copy to clipboard
-  - [x] Download QR as PNG
-  - [x] Share button on each board
-  - [x] Build succeeds (390.82 KB bundle, 121.28 KB gzipped)
-- [x] Documentation - Development log created
-- [x] All commits pushed to main
-- [x] GitHub issues commented/closed
+- [x] Sprint 4 Issues #23, #24, #25, #22 ✅ (all delivered and documented)
+- [x] Updated README with Sprint 4 features
+- [x] Created Issue #26 implementation plan (800+ lines)
+- [x] Issue #26 Phase 3: Catalog Utilities ✅
+  - [x] Created src/types/community-catalog.ts (87 lines)
+  - [x] Created src/utils/community-catalog.ts (260 lines)
+  - [x] Fetch catalog from GitHub with caching
+  - [x] Filter boards by query, category, tags, grid size
+  - [x] Sort by name, newest, oldest, buttons, downloads
+  - [x] Cache management (1 hour TTL)
+- [x] Issue #26 Phase 4: Community Browse Modal ✅
+  - [x] Created src/components/CommunityBrowseModal.tsx (490 lines)
+  - [x] Category tabs with featured filter
+  - [x] Search bar and grid size filter
+  - [x] Sort dropdown (5 options)
+  - [x] Board grid display with thumbnails
+  - [x] Board preview modal
+  - [x] Import functionality
+- [x] Issue #26 Phase 5: App Integration ✅
+  - [x] Added CommunityBrowseModal to App.tsx
+  - [x] Added handleImportFromCommunity handler
+  - [x] Added "Browse Community" button to BoardLibrary
+  - [x] Updated drag-and-drop to exclude community modal
+  - [x] Build succeeds (402.80 KB bundle, 124.09 KB gzipped)
 
 ### Next
-- [ ] Manual testing of all Sprint 4 features
-- [ ] Sprint 4 Issue #26 - Community Board Repository
-- [ ] Update README with Sprint 4 features
+- [ ] Issue #26 Phase 6: GitHub Repository Setup
+  - [ ] Create lovewords-boards repository
+  - [ ] Set up directory structure
+  - [ ] Create catalog.json
+- [ ] Issue #26 Phase 7: Initial Board Content
+  - [ ] Create sample community boards
+  - [ ] Add thumbnails
+  - [ ] Test import flow
+- [ ] Issue #26 Phase 8: Documentation
+- [ ] Commit Issue #26 progress
+- [ ] Manual testing of community browse
 - [ ] Plan Sprint 5
-- [ ] Consider: Automated tests
-- [ ] Consider: Performance profiling
 
 ### Decisions
 - **Export format**: Standard OBF JSON (pretty-printed, human-readable)
@@ -70,6 +67,11 @@ status: completed
 - **Storage**: localStorage (same as custom boards)
 - **ZIP library**: JSZip (recommended, 20KB gzipped, easy API)
 - **Manifest format**: JSON with version, timestamp, board metadata
+- **Community catalog source**: GitHub raw content (wildcard/lovewords-boards repo)
+- **Catalog caching**: 1 hour TTL in localStorage, stale fallback on fetch error
+- **Community URL format**: `https://raw.githubusercontent.com/wildcard/lovewords-boards/main/catalog.json`
+- **Filter architecture**: Client-side filtering (no backend API needed)
+- **Browse modal color**: Purple to differentiate from local import (blue)
 
 ### Sprint 4 Deliverables
 

@@ -12,6 +12,7 @@ import { ButtonEditor } from './components/ButtonEditor';
 import { BoardLibrary } from './components/BoardLibrary';
 import { ImportModal } from './components/ImportModal';
 import { ShareModal } from './components/ShareModal';
+import { CommunityBrowseModal } from './components/CommunityBrowseModal';
 import { DragOverlay } from './components/DragOverlay';
 import { ScreenReaderAnnouncer } from './components/ScreenReaderAnnouncer';
 import { BoardNavigator } from './core/board-navigator';
@@ -36,6 +37,7 @@ export function App() {
   const [showBoardCreator, setShowBoardCreator] = useState(false);
   const [showBoardLibrary, setShowBoardLibrary] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showCommunityBrowse, setShowCommunityBrowse] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [boardToShare, setBoardToShare] = useState<ObfBoard | null>(null);
   const [existingBoardIds, setExistingBoardIds] = useState<string[]>([]);
@@ -70,7 +72,7 @@ export function App() {
   const { isDragging } = useDragDrop({
     onDrop: handleFileDrop,
     accept: ['.obf', '.json'],
-    enabled: !showImportModal && !showShareModal && !showSettings && !showBoardCreator && !showBoardLibrary,
+    enabled: !showImportModal && !showCommunityBrowse && !showShareModal && !showSettings && !showBoardCreator && !showBoardLibrary,
   });
 
   // Stable callback reference for useScanner (avoids circular dependency)
@@ -448,6 +450,10 @@ export function App() {
     setShowImportModal(true);
   }, []);
 
+  const handleOpenCommunityBrowse = useCallback(() => {
+    setShowCommunityBrowse(true);
+  }, []);
+
   const handleImportBoard = useCallback(async (board: ObfBoard) => {
     try {
       await storage.current.saveBoard(board);
@@ -463,6 +469,29 @@ export function App() {
       }
     } catch (error) {
       console.error('Failed to import board:', error);
+      if (error instanceof StorageQuotaError) {
+        announce(error.message, 'assertive');
+      } else {
+        announce('Failed to import board', 'assertive');
+      }
+    }
+  }, [navigator, announce]);
+
+  const handleImportFromCommunity = useCallback(async (board: ObfBoard) => {
+    try {
+      await storage.current.saveBoard(board);
+      announce(`Imported ${board.name} from community`);
+      setShowCommunityBrowse(false);
+
+      // Register board with navigator and navigate to it
+      if (navigator) {
+        navigator.registerBoard(board);
+        if (navigator.navigate(board.id)) {
+          forceUpdate({});
+        }
+      }
+    } catch (error) {
+      console.error('Failed to import board from community:', error);
       if (error instanceof StorageQuotaError) {
         announce(error.message, 'assertive');
       } else {
@@ -767,6 +796,7 @@ export function App() {
           onShareBoard={handleShareBoard}
           onExportAllBoards={handleExportAllBoards}
           onImportBoard={handleOpenImportModal}
+          onBrowseCommunity={handleOpenCommunityBrowse}
           onClose={() => setShowBoardLibrary(false)}
           loadAllBoards={loadAllBoards}
         />
@@ -793,6 +823,14 @@ export function App() {
             setShowShareModal(false);
             setBoardToShare(null);
           }}
+        />
+      )}
+
+      {/* Community browse modal */}
+      {showCommunityBrowse && (
+        <CommunityBrowseModal
+          onImport={handleImportFromCommunity}
+          onClose={() => setShowCommunityBrowse(false)}
         />
       )}
     </div>
