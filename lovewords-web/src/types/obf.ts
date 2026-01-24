@@ -34,6 +34,8 @@ export interface ObfBoard {
   ext_lovewords_warmth?: string[];
   /** Flag to identify custom (user-created) boards */
   ext_lovewords_custom?: boolean;
+  /** Flag to identify template boards */
+  ext_lovewords_template?: boolean;
   /** Timestamp when board was created (ISO 8601) */
   ext_lovewords_created_at?: string;
   /** Timestamp when board was last updated (ISO 8601) */
@@ -55,10 +57,14 @@ export interface ObfButton {
   background_color?: string;
   /** Border color */
   border_color?: string;
-  /** Image reference */
+  /** Image reference (OBF format - deprecated, use imageLibraryId) */
   image_id?: string;
   /** Sound reference */
   sound_id?: string;
+
+  // LoveWords Image Library extension
+  /** Reference to centralized image library */
+  imageLibraryId?: string;
   /** Whether button is hidden */
   hidden?: boolean;
 

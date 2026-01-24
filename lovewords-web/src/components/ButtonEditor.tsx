@@ -4,7 +4,8 @@
 
 import { useState, useEffect } from 'react';
 import type { ObfButton, ObfBoard } from '../types/obf';
-import { ImageUploader } from './ImageUploader';
+import { ImagePicker } from './ImagePicker';
+import { imageLibrary } from '../storage/image-library-backend';
 
 export interface ButtonEditorProps {
   /** The board being edited */
@@ -72,6 +73,8 @@ export function ButtonEditor({
   );
   const [borderColor, setBorderColor] = useState(button?.border_color || '');
   const [imageDataUrl, setImageDataUrl] = useState<string | undefined>(getExistingImage());
+  const [imageLibraryId, setImageLibraryId] = useState<string | undefined>(button?.imageLibraryId);
+  const [showImagePicker, setShowImagePicker] = useState(false);
   const [errors, setErrors] = useState<{ label?: string }>({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -97,6 +100,53 @@ export function ButtonEditor({
       }
     }
   }, [button]);
+
+  // Load image from library when imageLibraryId changes
+  useEffect(() => {
+    if (imageLibraryId) {
+      imageLibrary.getImage(imageLibraryId).then((image) => {
+        if (image) {
+          setImageDataUrl(image.dataUrl);
+        }
+      });
+    }
+  }, [imageLibraryId]);
+
+  // ImagePicker handlers
+  const handleSelectLibraryImage = async (selectedImageId: string) => {
+    // Decrement usage count for old image
+    if (imageLibraryId && imageLibraryId !== selectedImageId) {
+      try {
+        await imageLibrary.decrementUsage(imageLibraryId);
+      } catch (err) {
+        console.error('Failed to decrement usage for old image:', err);
+      }
+    }
+
+    // Increment usage count for new image
+    try {
+      await imageLibrary.incrementUsage(selectedImageId);
+      setImageLibraryId(selectedImageId);
+      setShowImagePicker(false);
+    } catch (err) {
+      console.error('Failed to increment usage for new image:', err);
+      alert('Failed to select image from library');
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    // Decrement usage count
+    if (imageLibraryId) {
+      try {
+        await imageLibrary.decrementUsage(imageLibraryId);
+      } catch (err) {
+        console.error('Failed to decrement usage:', err);
+      }
+    }
+
+    setImageLibraryId(undefined);
+    setImageDataUrl(undefined);
+  };
 
   const validate = (): boolean => {
     const newErrors: { label?: string } = {};
@@ -151,8 +201,12 @@ export function ButtonEditor({
         break;
     }
 
-    // If there's an image, set a placeholder image_id (parent will create the actual image)
-    if (imageDataUrl) {
+    // Image handling: prioritize image library
+    if (imageLibraryId) {
+      // New: Use image library reference
+      newButton.imageLibraryId = imageLibraryId;
+    } else if (imageDataUrl) {
+      // Legacy: Use OBF image reference (for backwards compatibility)
       newButton.image_id = button?.image_id || `image-${Date.now()}`;
     }
 
@@ -313,13 +367,49 @@ export function ButtonEditor({
               </div>
             </div>
 
-            {/* Image Upload */}
+            {/* Image Selection */}
             <div className="mb-6">
-              <ImageUploader
-                currentImage={imageDataUrl}
-                onImageUploaded={setImageDataUrl}
-                onImageRemoved={() => setImageDataUrl(undefined)}
-              />
+              <label className="block font-medium mb-2">Image</label>
+              {imageDataUrl ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="w-16 h-16 rounded border border-gray-300 bg-white overflow-hidden flex-shrink-0">
+                      <img
+                        src={imageDataUrl}
+                        alt="Button image"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-700">
+                        {imageLibraryId ? 'Image from library' : 'Custom image'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowImagePicker(true)}
+                    className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Choose Different Image
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowImagePicker(true)}
+                  className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                >
+                  🖼️ Choose from Library
+                </button>
+              )}
             </div>
 
             {/* Preview */}
@@ -393,6 +483,17 @@ export function ButtonEditor({
           </form>
         </div>
       </div>
+
+      {/* Image Picker Modal */}
+      {showImagePicker && (
+        <ImagePicker
+          onSelect={handleSelectLibraryImage}
+          onClose={() => setShowImagePicker(false)}
+          currentImageId={imageLibraryId}
+          allowUpload={true}
+          allowDelete={true}
+        />
+      )}
     </div>
   );
 }
