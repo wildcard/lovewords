@@ -19,7 +19,7 @@ import {
   getCacheAge,
   isCacheFresh,
 } from '../../utils/community-catalog';
-import type { CommunityBoard, FilterOptions, SortOption } from '../../types/community-catalog';
+import type { FilterOptions, SortOption } from '../../types/community-catalog';
 import {
   minimalCatalog,
   richCatalog,
@@ -564,7 +564,7 @@ describe('getNewBoards()', () => {
 describe('fetchCatalog()', () => {
   // Mock fetch and localStorage
   const mockFetch = vi.fn();
-  const mockLocalStorage = {
+  const mockLocalStorage: any = {
     store: {} as Record<string, string>,
     getItem: vi.fn((key: string) => mockLocalStorage.store[key] || null),
     setItem: vi.fn((key: string, value: string) => {
@@ -623,7 +623,6 @@ describe('fetchCatalog()', () => {
       await fetchCatalog();
 
       expect(mockLocalStorage.setItem).toHaveBeenCalled();
-      const cacheKey = mockLocalStorage.setItem.mock.calls[0][0];
       const cachedValue = JSON.parse(mockLocalStorage.setItem.mock.calls[0][1]);
       expect(cachedValue.data).toEqual(richCatalog);
       expect(cachedValue.timestamp).toBeDefined();
@@ -830,7 +829,7 @@ describe('fetchCatalog()', () => {
 // ============================================================================
 
 describe('clearCatalogCache()', () => {
-  const mockLocalStorage = {
+  const mockLocalStorage: any = {
     store: {} as Record<string, string>,
     getItem: vi.fn((key: string) => mockLocalStorage.store[key] || null),
     setItem: vi.fn((key: string, value: string) => {
@@ -879,7 +878,7 @@ describe('clearCatalogCache()', () => {
 });
 
 describe('getCacheAge()', () => {
-  const mockLocalStorage = {
+  const mockLocalStorage: any = {
     store: {} as Record<string, string>,
     getItem: vi.fn((key: string) => mockLocalStorage.store[key] || null),
     setItem: vi.fn(),
@@ -932,7 +931,7 @@ describe('getCacheAge()', () => {
 });
 
 describe('isCacheFresh()', () => {
-  const mockLocalStorage = {
+  const mockLocalStorage: any = {
     store: {} as Record<string, string>,
     getItem: vi.fn((key: string) => mockLocalStorage.store[key] || null),
     setItem: vi.fn(),
