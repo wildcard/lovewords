@@ -1,0 +1,74 @@
+{
+  "format": "open-board-0.1",
+  "id": "template-basic-emotions",
+  "name": "Basic Emotions",
+  "description_html": "Express basic feelings and emotions",
+  "buttons": [
+    {
+      "id": "btn-happy",
+      "label": "😊 Happy",
+      "background_color": "#FFD700",
+      "border_color": "#FFA500"
+    },
+    {
+      "id": "btn-sad",
+      "label": "😢 Sad",
+      "background_color": "#4682B4",
+      "border_color": "#1E90FF"
+    },
+    {
+      "id": "btn-angry",
+      "label": "😠 Angry",
+      "background_color": "#DC143C",
+      "border_color": "#8B0000"
+    },
+    {
+      "id": "btn-scared",
+      "label": "😨 Scared",
+      "background_color": "#9370DB",
+      "border_color": "#6A5ACD"
+    },
+    {
+      "id": "btn-surprised",
+      "label": "😲 Surprised",
+      "background_color": "#FF8C00",
+      "border_color": "#FF4500"
+    },
+    {
+      "id": "btn-excited",
+      "label": "🤩 Excited",
+      "background_color": "#FFD700",
+      "border_color": "#FFA500"
+    },
+    {
+      "id": "btn-calm",
+      "label": "😌 Calm",
+      "background_color": "#90EE90",
+      "border_color": "#32CD32"
+    },
+    {
+      "id": "btn-confused",
+      "label": "😕 Confused",
+      "background_color": "#A9A9A9",
+      "border_color": "#696969"
+    },
+    {
+      "id": "btn-tired",
+      "label": "😴 Tired",
+      "background_color": "#708090",
+      "border_color": "#2F4F4F"
+    }
+  ],
+  "images": [],
+  "sounds": [],
+  "grid": {
+    "rows": 3,
+    "columns": 3,
+    "order": [
+      ["btn-happy", "btn-sad", "btn-angry"],
+      ["btn-scared", "btn-surprised", "btn-excited"],
+      ["btn-calm", "btn-confused", "btn-tired"]
+    ]
+  },
+  "ext_lovewords_template": true
+}

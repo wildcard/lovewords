@@ -1,0 +1,92 @@
+{
+  "format": "open-board-0.1",
+  "id": "template-questions-conversation",
+  "name": "Questions & Conversation",
+  "description_html": "Social interaction starters and questions",
+  "buttons": [
+    {
+      "id": "btn-who",
+      "label": "❓ Who?",
+      "background_color": "#FFB6C1",
+      "border_color": "#FF69B4"
+    },
+    {
+      "id": "btn-what",
+      "label": "❓ What?",
+      "background_color": "#DDA0DD",
+      "border_color": "#9370DB"
+    },
+    {
+      "id": "btn-when",
+      "label": "🕐 When?",
+      "background_color": "#87CEEB",
+      "border_color": "#4682B4"
+    },
+    {
+      "id": "btn-where",
+      "label": "📍 Where?",
+      "background_color": "#90EE90",
+      "border_color": "#32CD32"
+    },
+    {
+      "id": "btn-why",
+      "label": "🤔 Why?",
+      "background_color": "#F0E68C",
+      "border_color": "#DAA520"
+    },
+    {
+      "id": "btn-how",
+      "label": "❓ How?",
+      "background_color": "#FFA07A",
+      "border_color": "#FF6347"
+    },
+    {
+      "id": "btn-tellme",
+      "label": "💬 Tell me",
+      "background_color": "#ADD8E6",
+      "border_color": "#4682B4"
+    },
+    {
+      "id": "btn-showme",
+      "label": "👁️ Show me",
+      "background_color": "#E6E6FA",
+      "border_color": "#9370DB"
+    },
+    {
+      "id": "btn-like",
+      "label": "👍 I like",
+      "background_color": "#98FB98",
+      "border_color": "#32CD32"
+    },
+    {
+      "id": "btn-dontlike",
+      "label": "👎 I don't like",
+      "background_color": "#FFE4E1",
+      "border_color": "#DC143C"
+    },
+    {
+      "id": "btn-maybe",
+      "label": "🤷 Maybe",
+      "background_color": "#F5DEB3",
+      "border_color": "#D2691E"
+    },
+    {
+      "id": "btn-dontknow",
+      "label": "❓ I don't know",
+      "background_color": "#D3D3D3",
+      "border_color": "#A9A9A9"
+    }
+  ],
+  "images": [],
+  "sounds": [],
+  "grid": {
+    "rows": 3,
+    "columns": 4,
+    "order": [
+      ["btn-who", "btn-what", "btn-when", "btn-where"],
+      ["btn-why", "btn-how", "btn-tellme", "btn-showme"],
+      ["btn-like", "btn-dontlike", "btn-maybe", "btn-dontknow"]
+    ]
+  },
+  "ext_lovewords_template": true
+}

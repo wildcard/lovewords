@@ -1,0 +1,81 @@
+{
+  "version": "1.0",
+  "updated": "2026-01-24",
+  "templates": [
+    {
+      "id": "basic-emotions",
+      "name": "Basic Emotions",
+      "description": "Express basic feelings and emotions",
+      "category": "Emotions",
+      "featured": true,
+      "grid": {
+        "rows": 3,
+        "columns": 3
+      },
+      "buttonCount": 9,
+      "file": "/templates/basic-emotions.obf",
+      "tags": ["emotions", "feelings", "beginner"],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "core-needs",
+      "name": "Core Needs",
+      "description": "Basic communication needs and requests",
+      "category": "Daily Life",
+      "featured": true,
+      "grid": {
+        "rows": 4,
+        "columns": 4
+      },
+      "buttonCount": 16,
+      "file": "/templates/core-needs.obf",
+      "tags": ["needs", "requests", "essential", "beginner"],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "daily-routine",
+      "name": "Daily Routine",
+      "description": "Daily activities and schedule",
+      "category": "Daily Life",
+      "featured": false,
+      "grid": {
+        "rows": 4,
+        "columns": 4
+      },
+      "buttonCount": 16,
+      "file": "/templates/daily-routine.obf",
+      "tags": ["routine", "schedule", "activities"],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "questions-conversation",
+      "name": "Questions & Conversation",
+      "description": "Social interaction starters and questions",
+      "category": "Social",
+      "featured": true,
+      "grid": {
+        "rows": 3,
+        "columns": 4
+      },
+      "buttonCount": 12,
+      "file": "/templates/questions-conversation.obf",
+      "tags": ["questions", "conversation", "social"],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "feelings-scale",
+      "name": "Feelings Scale",
+      "description": "Rate the intensity of your feelings",
+      "category": "Emotions",
+      "featured": false,
+      "grid": {
+        "rows": 2,
+        "columns": 5
+      },
+      "buttonCount": 10,
+      "file": "/templates/feelings-scale.obf",
+      "tags": ["emotions", "rating", "intensity"],
+      "difficulty": "intermediate"
+    }
+  ]
+}

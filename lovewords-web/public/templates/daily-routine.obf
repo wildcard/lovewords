@@ -1,0 +1,117 @@
+{
+  "format": "open-board-0.1",
+  "id": "template-daily-routine",
+  "name": "Daily Routine",
+  "description_html": "Daily activities and schedule",
+  "buttons": [
+    {
+      "id": "btn-wakeup",
+      "label": "☀️ Wake up",
+      "background_color": "#FFD700",
+      "border_color": "#FFA500"
+    },
+    {
+      "id": "btn-breakfast",
+      "label": "🥞 Breakfast",
+      "background_color": "#FFE4B5",
+      "border_color": "#DAA520"
+    },
+    {
+      "id": "btn-dressed",
+      "label": "👕 Get dressed",
+      "background_color": "#87CEEB",
+      "border_color": "#4682B4"
+    },
+    {
+      "id": "btn-teeth",
+      "label": "🪥 Brush teeth",
+      "background_color": "#ADD8E6",
+      "border_color": "#4682B4"
+    },
+    {
+      "id": "btn-school",
+      "label": "🎒 School",
+      "background_color": "#90EE90",
+      "border_color": "#32CD32"
+    },
+    {
+      "id": "btn-lunch",
+      "label": "🥗 Lunch",
+      "background_color": "#98FB98",
+      "border_color": "#32CD32"
+    },
+    {
+      "id": "btn-play",
+      "label": "⚽ Play",
+      "background_color": "#FFB6C1",
+      "border_color": "#FF69B4"
+    },
+    {
+      "id": "btn-tv",
+      "label": "📺 TV",
+      "background_color": "#DDA0DD",
+      "border_color": "#9370DB"
+    },
+    {
+      "id": "btn-snack",
+      "label": "🍪 Snack",
+      "background_color": "#F0E68C",
+      "border_color": "#DAA520"
+    },
+    {
+      "id": "btn-homework",
+      "label": "📝 Homework",
+      "background_color": "#FFE4E1",
+      "border_color": "#DC143C"
+    },
+    {
+      "id": "btn-dinner",
+      "label": "🍝 Dinner",
+      "background_color": "#FFA07A",
+      "border_color": "#FF6347"
+    },
+    {
+      "id": "btn-bath",
+      "label": "🛁 Bath",
+      "background_color": "#B0E0E6",
+      "border_color": "#4682B4"
+    },
+    {
+      "id": "btn-pajamas",
+      "label": "👔 Pajamas",
+      "background_color": "#E6E6FA",
+      "border_color": "#9370DB"
+    },
+    {
+      "id": "btn-story",
+      "label": "📖 Story",
+      "background_color": "#F5DEB3",
+      "border_color": "#D2691E"
+    },
+    {
+      "id": "btn-bed",
+      "label": "🛏️ Bed",
+      "background_color": "#B0C4DE",
+      "border_color": "#4682B4"
+    },
+    {
+      "id": "btn-sleep",
+      "label": "💤 Sleep",
+      "background_color": "#778899",
+      "border_color": "#2F4F4F"
+    }
+  ],
+  "images": [],
+  "sounds": [],
+  "grid": {
+    "rows": 4,
+    "columns": 4,
+    "order": [
+      ["btn-wakeup", "btn-breakfast", "btn-dressed", "btn-teeth"],
+      ["btn-school", "btn-lunch", "btn-play", "btn-tv"],
+      ["btn-snack", "btn-homework", "btn-dinner", "btn-bath"],
+      ["btn-pajamas", "btn-story", "btn-bed", "btn-sleep"]
+    ]
+  },
+  "ext_lovewords_template": true
+}

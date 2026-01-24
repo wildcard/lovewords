@@ -1,0 +1,79 @@
+{
+  "format": "open-board-0.1",
+  "id": "template-feelings-scale",
+  "name": "Feelings Scale",
+  "description_html": "Rate the intensity of your feelings",
+  "buttons": [
+    {
+      "id": "btn-scale-1",
+      "label": "😐 1 - Not at all",
+      "background_color": "#E8E8E8",
+      "border_color": "#C0C0C0"
+    },
+    {
+      "id": "btn-scale-2",
+      "label": "🙂 2 - A little",
+      "background_color": "#D0E8F0",
+      "border_color": "#87CEEB"
+    },
+    {
+      "id": "btn-scale-3",
+      "label": "😊 3 - Somewhat",
+      "background_color": "#B0D8E0",
+      "border_color": "#4682B4"
+    },
+    {
+      "id": "btn-scale-4",
+      "label": "😄 4 - A lot",
+      "background_color": "#90C8D0",
+      "border_color": "#1E90FF"
+    },
+    {
+      "id": "btn-scale-5",
+      "label": "🤩 5 - Very much",
+      "background_color": "#70B8C0",
+      "border_color": "#0080FF"
+    },
+    {
+      "id": "btn-happy",
+      "label": "😊 Happy",
+      "background_color": "#FFD700",
+      "border_color": "#FFA500"
+    },
+    {
+      "id": "btn-sad",
+      "label": "😢 Sad",
+      "background_color": "#4682B4",
+      "border_color": "#1E90FF"
+    },
+    {
+      "id": "btn-angry",
+      "label": "😠 Angry",
+      "background_color": "#DC143C",
+      "border_color": "#8B0000"
+    },
+    {
+      "id": "btn-scared",
+      "label": "😨 Scared",
+      "background_color": "#9370DB",
+      "border_color": "#6A5ACD"
+    },
+    {
+      "id": "btn-excited",
+      "label": "🤩 Excited",
+      "background_color": "#FF8C00",
+      "border_color": "#FF4500"
+    }
+  ],
+  "images": [],
+  "sounds": [],
+  "grid": {
+    "rows": 2,
+    "columns": 5,
+    "order": [
+      ["btn-scale-1", "btn-scale-2", "btn-scale-3", "btn-scale-4", "btn-scale-5"],
+      ["btn-happy", "btn-sad", "btn-angry", "btn-scared", "btn-excited"]
+    ]
+  },
+  "ext_lovewords_template": true
+}

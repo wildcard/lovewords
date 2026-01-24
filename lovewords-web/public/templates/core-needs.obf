@@ -1,0 +1,117 @@
+{
+  "format": "open-board-0.1",
+  "id": "template-core-needs",
+  "name": "Core Needs",
+  "description_html": "Basic communication needs and requests",
+  "buttons": [
+    {
+      "id": "btn-want",
+      "label": "🙋 I want",
+      "background_color": "#87CEEB",
+      "border_color": "#4682B4"
+    },
+    {
+      "id": "btn-need",
+      "label": "🆘 I need",
+      "background_color": "#FF6B6B",
+      "border_color": "#DC143C"
+    },
+    {
+      "id": "btn-help",
+      "label": "🆘 Help",
+      "background_color": "#FF4500",
+      "border_color": "#8B0000"
+    },
+    {
+      "id": "btn-yes",
+      "label": "✅ Yes",
+      "background_color": "#90EE90",
+      "border_color": "#32CD32"
+    },
+    {
+      "id": "btn-no",
+      "label": "❌ No",
+      "background_color": "#FFB6C1",
+      "border_color": "#DC143C"
+    },
+    {
+      "id": "btn-more",
+      "label": "➕ More",
+      "background_color": "#DDA0DD",
+      "border_color": "#9370DB"
+    },
+    {
+      "id": "btn-stop",
+      "label": "🛑 Stop",
+      "background_color": "#DC143C",
+      "border_color": "#8B0000"
+    },
+    {
+      "id": "btn-please",
+      "label": "🙏 Please",
+      "background_color": "#F0E68C",
+      "border_color": "#DAA520"
+    },
+    {
+      "id": "btn-thankyou",
+      "label": "💖 Thank you",
+      "background_color": "#FFB6C1",
+      "border_color": "#FF69B4"
+    },
+    {
+      "id": "btn-food",
+      "label": "🍽️ Food",
+      "background_color": "#FFA07A",
+      "border_color": "#FF6347"
+    },
+    {
+      "id": "btn-drink",
+      "label": "🥤 Drink",
+      "background_color": "#87CEEB",
+      "border_color": "#4682B4"
+    },
+    {
+      "id": "btn-bathroom",
+      "label": "🚻 Bathroom",
+      "background_color": "#ADD8E6",
+      "border_color": "#4682B4"
+    },
+    {
+      "id": "btn-medicine",
+      "label": "💊 Medicine",
+      "background_color": "#FFE4B5",
+      "border_color": "#DAA520"
+    },
+    {
+      "id": "btn-hurt",
+      "label": "🤕 Hurt",
+      "background_color": "#FFB6C1",
+      "border_color": "#DC143C"
+    },
+    {
+      "id": "btn-tired",
+      "label": "😴 Tired",
+      "background_color": "#B0C4DE",
+      "border_color": "#4682B4"
+    },
+    {
+      "id": "btn-home",
+      "label": "🏠 Home",
+      "background_color": "#F5DEB3",
+      "border_color": "#D2691E"
+    }
+  ],
+  "images": [],
+  "sounds": [],
+  "grid": {
+    "rows": 4,
+    "columns": 4,
+    "order": [
+      ["btn-want", "btn-need", "btn-help", "btn-yes"],
+      ["btn-no", "btn-more", "btn-stop", "btn-please"],
+      ["btn-thankyou", "btn-food", "btn-drink", "btn-bathroom"],
+      ["btn-medicine", "btn-hurt", "btn-tired", "btn-home"]
+    ]
+  },
+  "ext_lovewords_template": true
+}
