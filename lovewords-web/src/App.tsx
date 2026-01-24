@@ -13,6 +13,7 @@ import { BoardLibrary } from './components/BoardLibrary';
 import { ImportModal } from './components/ImportModal';
 import { ShareModal } from './components/ShareModal';
 import { CommunityBrowseModal } from './components/CommunityBrowseModal';
+import { TemplatePickerModal } from './components/TemplatePickerModal';
 import { DragOverlay } from './components/DragOverlay';
 import { ScreenReaderAnnouncer } from './components/ScreenReaderAnnouncer';
 import { BoardNavigator } from './core/board-navigator';
@@ -27,6 +28,7 @@ import { LocalStorageBackend, getOrCreateProfile, StorageQuotaError } from './st
 import { DEFAULT_PROFILE } from './types/profile';
 import type { Profile } from './types/profile';
 import { downloadBoard, exportAllBoards } from './utils/board-export';
+import { loadTemplate } from './utils/template-loader';
 
 export function App() {
   const [navigator, setNavigator] = useState<BoardNavigator | null>(null);
@@ -38,6 +40,7 @@ export function App() {
   const [showBoardLibrary, setShowBoardLibrary] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showCommunityBrowse, setShowCommunityBrowse] = useState(false);
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [boardToShare, setBoardToShare] = useState<ObfBoard | null>(null);
   const [existingBoardIds, setExistingBoardIds] = useState<string[]>([]);
@@ -72,7 +75,7 @@ export function App() {
   const { isDragging } = useDragDrop({
     onDrop: handleFileDrop,
     accept: ['.obf', '.json'],
-    enabled: !showImportModal && !showCommunityBrowse && !showShareModal && !showSettings && !showBoardCreator && !showBoardLibrary,
+    enabled: !showImportModal && !showCommunityBrowse && !showTemplatePicker && !showShareModal && !showSettings && !showBoardCreator && !showBoardLibrary,
   });
 
   // Stable callback reference for useScanner (avoids circular dependency)
@@ -500,6 +503,60 @@ export function App() {
     }
   }, [navigator, announce]);
 
+  const handleOpenTemplatePicker = useCallback(() => {
+    setShowTemplatePicker(true);
+  }, []);
+
+  const handleSelectTemplate = useCallback(async (templateId: string) => {
+    try {
+      // Load template
+      const result = await loadTemplate(templateId);
+
+      if (!result.success || !result.board) {
+        announce(result.error || 'Failed to load template', 'assertive');
+        return;
+      }
+
+      const template = result.board;
+
+      // Generate new unique ID
+      const timestamp = Date.now();
+      const newId = `${template.id}-${timestamp}`;
+
+      // Create new board from template
+      const newBoard: ObfBoard = {
+        ...template,
+        id: newId,
+        name: template.name, // Keep template name, user can rename later
+        ext_lovewords_custom: true,
+        ext_lovewords_created_at: new Date().toISOString(),
+        ext_lovewords_updated_at: new Date().toISOString(),
+        ext_lovewords_template: undefined, // Remove template flag
+      };
+
+      // Save to storage
+      await storage.current.saveBoard(newBoard);
+      announce(`Created board from template: ${template.name}`);
+      setShowTemplatePicker(false);
+      setShowBoardLibrary(false); // Close library modal
+
+      // Register board with navigator and navigate to it
+      if (navigator) {
+        navigator.registerBoard(newBoard);
+        if (navigator.navigate(newBoard.id)) {
+          forceUpdate({});
+        }
+      }
+    } catch (error) {
+      console.error('Failed to create board from template:', error);
+      if (error instanceof StorageQuotaError) {
+        announce(error.message, 'assertive');
+      } else {
+        announce('Failed to create board from template', 'assertive');
+      }
+    }
+  }, [navigator, announce]);
+
   // Button editing handlers
   const handleSaveButton = useCallback(async (button: ObfButton, row: number, col: number, imageDataUrl?: string) => {
     if (!navigator) return;
@@ -797,6 +854,7 @@ export function App() {
           onExportAllBoards={handleExportAllBoards}
           onImportBoard={handleOpenImportModal}
           onBrowseCommunity={handleOpenCommunityBrowse}
+          onSelectTemplate={handleOpenTemplatePicker}
           onClose={() => setShowBoardLibrary(false)}
           loadAllBoards={loadAllBoards}
         />
@@ -831,6 +889,14 @@ export function App() {
         <CommunityBrowseModal
           onImport={handleImportFromCommunity}
           onClose={() => setShowCommunityBrowse(false)}
+        />
+      )}
+
+      {/* Template picker modal */}
+      {showTemplatePicker && (
+        <TemplatePickerModal
+          onSelectTemplate={handleSelectTemplate}
+          onClose={() => setShowTemplatePicker(false)}
         />
       )}
     </div>

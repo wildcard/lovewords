@@ -33,6 +33,8 @@ export interface BoardLibraryProps {
   onImportBoard?: () => void;
   /** Callback to browse community boards */
   onBrowseCommunity?: () => void;
+  /** Callback to open template picker */
+  onSelectTemplate?: () => void;
   /** Callback to close the library */
   onClose: () => void;
   /** Function to load all boards */
@@ -161,6 +163,7 @@ export function BoardLibrary({
   onExportAllBoards,
   onImportBoard,
   onBrowseCommunity,
+  onSelectTemplate,
   onClose,
   loadAllBoards,
 }: BoardLibraryProps) {
@@ -268,6 +271,16 @@ export function BoardLibrary({
                   type="button"
                 >
                   📦 Export All ({customBoards.length})
+                </button>
+              )}
+              {onSelectTemplate && (
+                <button
+                  onClick={onSelectTemplate}
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors text-sm font-medium"
+                  aria-label="Start from template"
+                  type="button"
+                >
+                  📋 Start from Template
                 </button>
               )}
               {onImportBoard && (
