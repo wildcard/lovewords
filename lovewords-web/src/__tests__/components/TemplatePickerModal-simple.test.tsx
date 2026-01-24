@@ -8,30 +8,29 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TemplatePickerModal } from '../../components/TemplatePickerModal';
-import * as templateLoader from '../../utils/template-loader';
-import type { TemplateManifest } from '../../types/template-catalog';
+import type { TemplateManifest, TemplateMetadata, TemplateFilterOptions } from '../../types/template-catalog';
 
 // Mock implementation
 const mockLoadTemplateManifest = vi.fn();
-const mockFilterTemplates = vi.fn((templates, options) => {
+const mockFilterTemplates = vi.fn((templates: TemplateMetadata[], options?: TemplateFilterOptions) => {
   let filtered = [...templates];
   if (options?.query) {
     const query = options.query.toLowerCase();
-    filtered = filtered.filter(t =>
+    filtered = filtered.filter((t: TemplateMetadata) =>
       t.name.toLowerCase().includes(query) ||
       t.description.toLowerCase().includes(query)
     );
   }
   if (options?.category && options.category !== 'All') {
-    filtered = filtered.filter(t => t.category === options.category);
+    filtered = filtered.filter((t: TemplateMetadata) => t.category === options.category);
   }
   if (options?.featured !== undefined) {
-    filtered = filtered.filter(t => t.featured === options.featured);
+    filtered = filtered.filter((t: TemplateMetadata) => t.featured === options.featured);
   }
   return filtered;
 });
-const mockGetCategories = vi.fn((templates) => {
-  const categories = new Set(templates.map(t => t.category));
+const mockGetCategories = vi.fn((templates: TemplateMetadata[]) => {
+  const categories = new Set(templates.map((t: TemplateMetadata) => t.category));
   return ['All', ...Array.from(categories).sort()];
 });
 

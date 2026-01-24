@@ -7,7 +7,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { loadTemplate } from '../../utils/template-loader';
 import type { ObfBoard } from '../../types/obf';
-import type { LoadTemplateResult } from '../../types/template-catalog';
 
 // Mock localStorage
 const mockLocalStorage: any = {

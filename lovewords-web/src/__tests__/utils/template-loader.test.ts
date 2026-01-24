@@ -4,7 +4,7 @@
  * Tests for template loading and filtering utilities.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   loadTemplateManifest,
   loadTemplate,
