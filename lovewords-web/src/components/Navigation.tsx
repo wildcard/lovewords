@@ -2,6 +2,8 @@
  * Navigation component - back/home buttons and breadcrumbs
  */
 
+import { UndoRedoControls } from './UndoRedoControls';
+
 export interface NavigationProps {
   /** Breadcrumb trail of board names */
   breadcrumbs: string[];
@@ -23,6 +25,15 @@ export interface NavigationProps {
   isEditMode?: boolean;
   /** Callback to toggle edit mode */
   onToggleEditMode?: () => void;
+  /** Undo/redo state and callbacks */
+  undoRedo?: {
+    canUndo: boolean;
+    canRedo: boolean;
+    undoDescription: string | null;
+    redoDescription: string | null;
+    onUndo: () => void;
+    onRedo: () => void;
+  };
 }
 
 export function Navigation({
@@ -36,6 +47,7 @@ export function Navigation({
   isCustomBoard,
   isEditMode,
   onToggleEditMode,
+  undoRedo,
 }: NavigationProps) {
   return (
     <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-300">
@@ -76,6 +88,18 @@ export function Navigation({
       </nav>
 
       <div className="flex items-center gap-2">
+        {/* Undo/Redo controls - only visible in edit mode */}
+        {isEditMode && undoRedo && (
+          <UndoRedoControls
+            canUndo={undoRedo.canUndo}
+            canRedo={undoRedo.canRedo}
+            undoDescription={undoRedo.undoDescription}
+            redoDescription={undoRedo.redoDescription}
+            onUndo={undoRedo.onUndo}
+            onRedo={undoRedo.onRedo}
+          />
+        )}
+
         {isCustomBoard && onToggleEditMode && (
           <button
             className={`nav-button ${isEditMode ? 'bg-blue-600 text-white' : ''}`}

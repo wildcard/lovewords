@@ -14,6 +14,7 @@ import { ImportModal } from './components/ImportModal';
 import { ShareModal } from './components/ShareModal';
 import { CommunityBrowseModal } from './components/CommunityBrowseModal';
 import { TemplatePickerModal } from './components/TemplatePickerModal';
+import { ImageLibraryManager } from './components/ImageLibraryManager';
 import { DragOverlay } from './components/DragOverlay';
 import { ScreenReaderAnnouncer } from './components/ScreenReaderAnnouncer';
 import { BoardNavigator } from './core/board-navigator';
@@ -24,11 +25,13 @@ import { useSpeech } from './hooks/useSpeech';
 import { useAnnouncer } from './hooks/useAnnouncer';
 import { useScanner } from './hooks/useScanner';
 import { useDragDrop } from './hooks/useDragDrop';
+import { useUndoRedo } from './hooks/useUndoRedo';
 import { LocalStorageBackend, getOrCreateProfile, StorageQuotaError } from './storage/local-storage';
 import { DEFAULT_PROFILE } from './types/profile';
 import type { Profile } from './types/profile';
 import { downloadBoard, exportAllBoards } from './utils/board-export';
 import { loadTemplate } from './utils/template-loader';
+import { migrateAllBoards, isMigrationComplete } from './utils/image-migration';
 
 export function App() {
   const [navigator, setNavigator] = useState<BoardNavigator | null>(null);
@@ -41,6 +44,7 @@ export function App() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showCommunityBrowse, setShowCommunityBrowse] = useState(false);
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+  const [showImageLibraryManager, setShowImageLibraryManager] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [boardToShare, setBoardToShare] = useState<ObfBoard | null>(null);
   const [existingBoardIds, setExistingBoardIds] = useState<string[]>([]);
@@ -54,6 +58,23 @@ export function App() {
   const storage = useRef(new LocalStorageBackend());
   const { speak, isSpeaking, voices } = useSpeech(profile.speech);
   const { announcement, announce } = useAnnouncer();
+
+  // Undo/redo for board editing
+  const {
+    canUndo,
+    canRedo,
+    undoDescription,
+    redoDescription,
+    pushHistory,
+    undo,
+    redo,
+    clearHistory,
+  } = useUndoRedo({
+    enabled: isEditMode,
+    onStateChange: useCallback((_board: ObfBoard, description: string) => {
+      announce(description);
+    }, [announce]),
+  });
 
   // Drag-and-drop file import
   const handleFileDrop = useCallback(async (files: File[]) => {
@@ -75,7 +96,7 @@ export function App() {
   const { isDragging } = useDragDrop({
     onDrop: handleFileDrop,
     accept: ['.obf', '.json'],
-    enabled: !showImportModal && !showCommunityBrowse && !showTemplatePicker && !showShareModal && !showSettings && !showBoardCreator && !showBoardLibrary,
+    enabled: !showImportModal && !showCommunityBrowse && !showTemplatePicker && !showImageLibraryManager && !showShareModal && !showSettings && !showBoardCreator && !showBoardLibrary,
   });
 
   // Stable callback reference for useScanner (avoids circular dependency)
@@ -106,6 +127,24 @@ export function App() {
         const nav = new BoardNavigator(homeBoard);
         setNavigator(nav);
         setLoading(false);
+
+        // Run image migration in background (non-blocking)
+        if (!isMigrationComplete()) {
+          migrateAllBoards(
+            () => storage.current.listCustomBoards(),
+            (board) => storage.current.saveBoard(board)
+          ).then((migrationResult) => {
+            if (migrationResult.buttonsUpdated > 0) {
+              console.log(
+                `Image migration complete: ${migrationResult.imagesAdded} added, ` +
+                `${migrationResult.imagesDeduplicated} deduplicated, ` +
+                `${migrationResult.buttonsUpdated} buttons updated`
+              );
+            }
+          }).catch((err) => {
+            console.error('Image migration failed:', err);
+          });
+        }
       } catch (err) {
         console.error('Failed to load initial data:', err);
         setError(err instanceof Error ? err.message : 'Failed to load application');
@@ -507,6 +546,10 @@ export function App() {
     setShowTemplatePicker(true);
   }, []);
 
+  const handleOpenImageLibrary = useCallback(() => {
+    setShowImageLibraryManager(true);
+  }, []);
+
   const handleSelectTemplate = useCallback(async (templateId: string) => {
     try {
       // Load template
@@ -622,6 +665,14 @@ export function App() {
       // Update grid order to reference this button
       updatedBoard.grid.order[row][col] = button.id;
 
+      // Push to undo history
+      const isNewButton = !currentBoard.buttons.find(b => b.id === button.id);
+      pushHistory(
+        currentBoard,
+        updatedBoard,
+        isNewButton ? `Add button "${button.label}"` : `Edit button "${button.label}"`
+      );
+
       // Save to localStorage
       await storage.current.saveBoard(updatedBoard);
 
@@ -639,7 +690,7 @@ export function App() {
         announce('Failed to save button', 'assertive');
       }
     }
-  }, [navigator, announce]);
+  }, [navigator, announce, pushHistory]);
 
   const handleDeleteButton = useCallback(async (buttonId: string, row: number, col: number) => {
     if (!navigator) return;
@@ -668,6 +719,14 @@ export function App() {
       // Remove from grid
       updatedBoard.grid.order[row][col] = null;
 
+      // Get the button label for history description
+      const deletedButton = currentBoard.buttons.find(b => b.id === buttonId);
+      pushHistory(
+        currentBoard,
+        updatedBoard,
+        `Delete button "${deletedButton?.label || 'Unknown'}"`
+      );
+
       // Save to localStorage
       await storage.current.saveBoard(updatedBoard);
 
@@ -681,7 +740,7 @@ export function App() {
       console.error('Failed to delete button:', error);
       announce('Failed to delete button', 'assertive');
     }
-  }, [navigator, announce]);
+  }, [navigator, announce, pushHistory]);
 
   const handleReorder = useCallback(async (newOrder: (string | null)[][]) => {
     if (!navigator) return;
@@ -708,6 +767,9 @@ export function App() {
         ext_lovewords_updated_at: new Date().toISOString(),
       };
 
+      // Push to undo history
+      pushHistory(currentBoard, updatedBoard, 'Reorder buttons');
+
       // Save to localStorage
       await storage.current.saveBoard(updatedBoard);
 
@@ -720,7 +782,50 @@ export function App() {
       console.error('Failed to reorder buttons:', error);
       announce('Failed to reorder buttons', 'assertive');
     }
-  }, [navigator, announce]);
+  }, [navigator, announce, pushHistory]);
+
+  // Undo handler - restores previous board state
+  const handleUndo = useCallback(async () => {
+    const previousBoard = undo();
+    if (!previousBoard || !navigator) return;
+
+    try {
+      // Save restored state
+      await storage.current.saveBoard(previousBoard);
+      // Update navigator
+      navigator.registerBoard(previousBoard);
+      forceUpdate({});
+    } catch (error) {
+      console.error('Failed to undo:', error);
+      announce('Failed to undo', 'assertive');
+    }
+  }, [undo, navigator, announce]);
+
+  // Redo handler - re-applies undone change
+  const handleRedo = useCallback(async () => {
+    const nextBoard = redo();
+    if (!nextBoard || !navigator) return;
+
+    try {
+      // Save restored state
+      await storage.current.saveBoard(nextBoard);
+      // Update navigator
+      navigator.registerBoard(nextBoard);
+      forceUpdate({});
+    } catch (error) {
+      console.error('Failed to redo:', error);
+      announce('Failed to redo', 'assertive');
+    }
+  }, [redo, navigator, announce]);
+
+  // Clear history when exiting edit mode
+  const handleToggleEditMode = useCallback(() => {
+    if (isEditMode) {
+      // Exiting edit mode - clear history
+      clearHistory();
+    }
+    setIsEditMode(!isEditMode);
+  }, [isEditMode, clearHistory]);
 
   // Render loading/error states
   if (loading) {
@@ -772,7 +877,15 @@ export function App() {
         onOpenBoardLibrary={() => setShowBoardLibrary(true)}
         isCustomBoard={!!state.currentBoard.ext_lovewords_custom}
         isEditMode={isEditMode}
-        onToggleEditMode={() => setIsEditMode(!isEditMode)}
+        onToggleEditMode={handleToggleEditMode}
+        undoRedo={{
+          canUndo,
+          canRedo,
+          undoDescription,
+          redoDescription,
+          onUndo: handleUndo,
+          onRedo: handleRedo,
+        }}
       />
 
       <MessageBar
@@ -855,6 +968,7 @@ export function App() {
           onImportBoard={handleOpenImportModal}
           onBrowseCommunity={handleOpenCommunityBrowse}
           onSelectTemplate={handleOpenTemplatePicker}
+          onOpenImageLibrary={handleOpenImageLibrary}
           onClose={() => setShowBoardLibrary(false)}
           loadAllBoards={loadAllBoards}
         />
@@ -897,6 +1011,13 @@ export function App() {
         <TemplatePickerModal
           onSelectTemplate={handleSelectTemplate}
           onClose={() => setShowTemplatePicker(false)}
+        />
+      )}
+
+      {/* Image Library Manager modal */}
+      {showImageLibraryManager && (
+        <ImageLibraryManager
+          onClose={() => setShowImageLibraryManager(false)}
         />
       )}
     </div>

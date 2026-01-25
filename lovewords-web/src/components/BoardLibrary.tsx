@@ -35,6 +35,8 @@ export interface BoardLibraryProps {
   onBrowseCommunity?: () => void;
   /** Callback to open template picker */
   onSelectTemplate?: () => void;
+  /** Callback to open image library manager */
+  onOpenImageLibrary?: () => void;
   /** Callback to close the library */
   onClose: () => void;
   /** Function to load all boards */
@@ -164,6 +166,7 @@ export function BoardLibrary({
   onImportBoard,
   onBrowseCommunity,
   onSelectTemplate,
+  onOpenImageLibrary,
   onClose,
   loadAllBoards,
 }: BoardLibraryProps) {
@@ -301,6 +304,16 @@ export function BoardLibrary({
                   type="button"
                 >
                   🌐 Browse Community
+                </button>
+              )}
+              {onOpenImageLibrary && (
+                <button
+                  onClick={onOpenImageLibrary}
+                  className="px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors text-sm font-medium"
+                  aria-label="Manage image library"
+                  type="button"
+                >
+                  🖼️ Images
                 </button>
               )}
               <button
